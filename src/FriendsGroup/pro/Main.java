@@ -4,11 +4,12 @@ package FriendsGroup.pro;
 Класс получает различные аргументы из командной строки
  */
 
-import java.io.File;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Main {
+//public String[][] block = new String [][];
 
     public static void main(String[] args) {
         boolean showFiles = false; // Показывать файлы
@@ -27,73 +28,49 @@ public class Main {
                 targetPath = args[0]; // Получили путь
                 System.out.println("Директория: " + targetPath);
                 showFiles = true;
+
+                // Проверка наличия пути и вывод результата
+                if (targetPath.length() > 0) {
+                    File objectsList[] = new File(targetPath).listFiles(); // Список объектов (файлов и директорий)
+
+                    // Перебор всех объектов
+                    for (File object : objectsList) {
+                        if (object.isFile()) {
+                            targetFile = object.getName();
+
+                            LogFile tempLogFile = new LogFile();
+                            System.out.println("");
+                            if (tempLogFile.parsigFile(targetPath, targetFile)) {
+                                System.out.println("Найдено блоков: " + tempLogFile.countBloks);
+                            }
+
+                            // Получение последнего файла на текущий момент
+//                    Date date = new Date();
+//                    String newDateTime = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(date);
+//                    System.out.println(compileFileName(newDateTime));
+//                            System.out.println(getBlock(targetPath + "\\" + targetFile));
+
+                            countFiles++;
+                        }
+                    }
+                    System.out.println("");
+                    System.out.println("Найдено файлов: " + countFiles);
+                }
                 break;
             case 2:
                 targetPath = args[0]; // Получили путь
                 System.out.println("Директория: " + targetPath);
                 targetFile = args[1]; // Получили файл
                 System.out.println("Файл: " + targetFile);
-                System.out.println(targetFile.length());
+
+                System.out.println("");
+                LogFile tempLogFile = new LogFile();
+                if (tempLogFile.parsigFile(targetPath, targetFile)) {
+                    System.out.println("Найдено блоков: " + tempLogFile.countBloks);
+                }
                 break;
         }
-
-        // Проверка наличия пути и вывод результата
-        if (showFiles && (targetPath.length() > 0)) {
-            File objectsList[] = new File(targetPath).listFiles(); // Список объектов (файлов и директорий)
-
-            // Перебор всех объектов
-            for (File object : objectsList) {
-                if (showFiles && object.isFile()) {
-                    System.out.println(object.getName() + " " + parsigFileName(object.getName(), "date"));
-                    Date date = new Date();
-
-                    String newDateTime = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(date);
-                    System.out.println(compileFileName(newDateTime));
-
-                    countFiles++;
-                }
-            }
-            System.out.println("Найдено файлов: " + countFiles);
-        }
     }
-
-//    Разбор имени файла в дату и время
-    static String parsigFileName(String fileName, String parametr) {
-        Date date = new Date();
-        String answer = "";
-
-        if (fileName.length() >= 21) {
-
-            switch (parametr) {
-                case "NOD": // Номер нода
-                    answer = fileName.substring(0, 5);
-                    break;
-                case "year": // Год
-                    answer = fileName.substring(5, 9);
-                    break;
-                case "month": //Месяц
-                    answer = fileName.substring(9, 11);
-                    break;
-                case "day": //День
-                    answer = fileName.substring(11, 13);
-                    break;
-                case "time": //Время
-                    answer = fileName.substring(13, 15) + ":" + fileName.substring(15, 17);
-                    break;
-                case "number": // Порядковый номер
-                    answer = fileName.substring(17, 21);
-                    break;
-                case "date": // Дата в удобном виде
-                    answer = fileName.substring(11, 13) + "." +
-                            fileName.substring(9, 11) + "." +
-                            fileName.substring(5, 9) + " " +
-                            fileName.substring(13, 15) + ":" + fileName.substring(15, 17);
-                    break;
-            }
-        }
-        return answer;
-    }
-
 
 //    Сборка даты и времени в имя файла
     static String compileFileName(String dateTime) {
@@ -104,4 +81,5 @@ public class Main {
                minute = "00", number = "00??";
         return NOD + year + month + day + hour.toString() + minute + number;
     }
+
 }
