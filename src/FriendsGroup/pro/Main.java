@@ -70,6 +70,11 @@ public class Main {
                 }
                 break;
         }
+
+        // БАЗА ДАННЫХ
+        PostgresDB tempDB = new PostgresDB();
+        tempDB.testDatabase();
+
     }
 
 //    Сборка даты и времени в имя файла
