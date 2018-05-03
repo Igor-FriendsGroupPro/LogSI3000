@@ -24,6 +24,10 @@ public class LogFile {
     String[] ED = new String[1000];     //Дата и время окончания звонка
     String[] A0 = new String[1000];     //IP вызывающего
     String[] A2 = new String[1000];     //IP назначения
+    int[] defiant = new int[1000];          //Вызывающий абонент
+                                        //    0 - Ростелеком. Для нас входящий
+                                        //    112 - ЦОВ
+
     int[] callDuration = new int[1000]; //Длительность звонка
 
     // Разбор файла
@@ -35,7 +39,7 @@ public class LogFile {
             logDirectory = directory;
             logFileName = fileName;
             logFullFileName = logDirectory + "\\" + logFileName;
-            System.out.println(logFileName);
+//            System.out.println(logFileName);
 
             String year = logFileName.substring(5, 9);
             String month = logFileName.substring(9, 11);
@@ -80,9 +84,21 @@ public class LogFile {
                             break;
                         case "<I103":
                             ED[countBloks] = strLine.substring(strLine.indexOf("ED") + 4, strLine.indexOf("FL") - 2);
+                            LogDateTime tempDT = new LogDateTime();
+                            callDuration[countBloks] = tempDT.duration(SD[countBloks], ED[countBloks]);
                             break;
                         case "<I127":
                             A0[countBloks] = strLine.substring(strLine.indexOf("A0") + 4, strLine.indexOf("A2") - 2);
+
+                            switch (A0[countBloks]) {
+                                case "172.20.212.64": // Входящий от Ростелекома
+                                    defiant[countBloks] = 0;
+                                    break;
+                                    default:
+                                        defiant[countBloks] = -1; // Неизвестный
+                                        break;
+                            }
+
                             A2[countBloks] = strLine.substring(strLine.indexOf("A2") + 4, strLine.indexOf(">") - 2);
                             break;
                     }

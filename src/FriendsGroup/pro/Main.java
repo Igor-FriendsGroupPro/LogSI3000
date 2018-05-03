@@ -33,28 +33,42 @@ public class Main {
                 if (targetPath.length() > 0) {
                     File objectsList[] = new File(targetPath).listFiles(); // Список объектов (файлов и директорий)
 
-                    // Перебор всех объектов
-                    for (File object : objectsList) {
-                        if (object.isFile()) {
-                            targetFile = object.getName();
+//                    for (int j=10; j<=30; j++) {
+                        long countCall = 0;
+                        long allDuration = 0;
+                        long avg = 0;
 
-                            LogFile tempLogFile = new LogFile();
-                            System.out.println("");
-                            if (tempLogFile.parsigFile(targetPath, targetFile)) {
-                                System.out.println("Найдено блоков: " + tempLogFile.countBloks);
+                        String condition = "2018-04-13";
+
+                        // Перебор всех объектов
+                        for (File object : objectsList) {
+                            countFiles = 0;
+                            if (object.isFile()) {
+                                targetFile = object.getName();
+
+                                // Парсинг лог файла и определение количества блоков
+                                LogFile tempLogFile = new LogFile();
+                                if (tempLogFile.parsigFile(targetPath, targetFile)) {
+
+                                    // Преребор блоков
+                                    for (int i = 1; i <= tempLogFile.countBloks; i++) {
+                                        // Условие отбора
+                                        if (tempLogFile.defiant[i] == 0 & tempLogFile.SD[i].startsWith(condition)) {
+                                            countCall++;
+                                            allDuration = allDuration + tempLogFile.callDuration[i];
+                                            System.out.println(tempLogFile.A0[i] + " " + tempLogFile.SD[i] + " длительностью " + tempLogFile.callDuration[i] + " сек");
+                                            System.out.println(allDuration);
+                                        }
+                                    }
+                                }
                             }
-
-                            // Получение последнего файла на текущий момент
-//                    Date date = new Date();
-//                    String newDateTime = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(date);
-//                    System.out.println(compileFileName(newDateTime));
-//                            System.out.println(getBlock(targetPath + "\\" + targetFile));
-
                             countFiles++;
                         }
-                    }
-                    System.out.println("");
-                    System.out.println("Найдено файлов: " + countFiles);
+                        avg = allDuration / countCall;
+//                    System.out.println("");
+//                    System.out.println("Найдено файлов: " + countFiles);
+                        System.out.println(countCall + " " + allDuration +" " + avg);
+//                    }
                 }
                 break;
             case 2:
@@ -63,7 +77,7 @@ public class Main {
                 targetFile = args[1]; // Получили файл
                 System.out.println("Файл: " + targetFile);
 
-                System.out.println("");
+//                System.out.println("");
                 LogFile tempLogFile = new LogFile();
                 if (tempLogFile.parsigFile(targetPath, targetFile)) {
                     System.out.println("Найдено блоков: " + tempLogFile.countBloks);
@@ -73,7 +87,7 @@ public class Main {
 
         // БАЗА ДАННЫХ
         PostgresDB tempDB = new PostgresDB();
-        tempDB.testDatabase();
+//        tempDB.testDatabase("contactdb", "admin", "password", "jc_contact", "first_name");
 
     }
 
