@@ -5,22 +5,38 @@ package FriendsGroup.pro;
  */
 
 import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Main {
 //public String[][] block = new String [][];
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
         boolean showFiles = false; // Показывать файлы
         String targetPath = ""; // Путь из аргумента
         String targetFile = ""; // Файл для парсинга
         Integer countFiles = 0; // Количество файлов
+        long[] allDuration = new long[32];
+        long[] allcauntCall = new long [32];
+
+        // База данных
+        PostgresDB database = new PostgresDB();
+        database.setUrlDatabase("");
+        database.setNameDatabase("LogSI3000");
+        database.setLoginDatabase("admin");
+        database.setPasswordDatabase("password");
+        database.setnameTableInDatabase("LogTxt");
+
+        System.out.println("База данных доступна " + database.testDatabase());
+
+        database.ClearTable();
+
 
         // Перебор всех аргументов и определение задачи
         System.out.println("Передано аргументов: " + args.length);
         switch (args.length) {
-            case 0:
+            case 0: // аргументов не передано
                 System.out.println("Ошибка: директория не получена");
                 System.out.println("Синтаксис: java -jar LogSI3000.jar DIRECTORY [FILE]");
                 break;
@@ -35,10 +51,9 @@ public class Main {
 
 //                    for (int j=10; j<=30; j++) {
                         long countCall = 0;
-                        long allDuration = 0;
                         long avg = 0;
 
-                        String condition = "2018-04-13";
+                        String condition = "2018-04";
 
                         // Перебор всех объектов
                         for (File object : objectsList) {
@@ -55,19 +70,28 @@ public class Main {
                                         // Условие отбора
                                         if (tempLogFile.defiant[i] == 0 & tempLogFile.SD[i].startsWith(condition)) {
                                             countCall++;
-                                            allDuration = allDuration + tempLogFile.callDuration[i];
-                                            System.out.println(tempLogFile.A0[i] + " " + tempLogFile.SD[i] + " длительностью " + tempLogFile.callDuration[i] + " сек");
-                                            System.out.println(allDuration);
+                                            allDuration[Integer.parseInt(tempLogFile.SD[i].substring(8, 10))] =
+                                                    allDuration[Integer.parseInt(tempLogFile.SD[i].substring(8, 10))] +
+                                                            tempLogFile.callDuration[i];
+                                            allcauntCall[Integer.parseInt(tempLogFile.SD[i].substring(8, 10))] =
+                                                    allcauntCall[Integer.parseInt(tempLogFile.SD[i].substring(8, 10))] +
+                                                            1;
+//                                            System.out.println(tempLogFile.A0[i] + " " + tempLogFile.SD[i] + " длительностью " + tempLogFile.callDuration[i] + " сек");
+//                                            System.out.println(allDuration);
                                         }
                                     }
                                 }
                             }
                             countFiles++;
                         }
-                        avg = allDuration / countCall;
-//                    System.out.println("");
+                    for (int i = 1 ; i<=30; i++){
+                        System.out.println("2018-04-" + i + " " + allcauntCall[i] + " " + allDuration[i] + " " + allDuration[i]/allcauntCall[i]);
+                    }
+
+                        //                    System.out.println("");
 //                    System.out.println("Найдено файлов: " + countFiles);
-                        System.out.println(countCall + " " + allDuration +" " + avg);
+//                        avg = allDuration / countCall;
+//                        System.out.println(countCall + " " + allDuration +" " + avg);
 //                    }
                 }
                 break;
@@ -84,11 +108,6 @@ public class Main {
                 }
                 break;
         }
-
-        // БАЗА ДАННЫХ
-        PostgresDB tempDB = new PostgresDB();
-//        tempDB.testDatabase("contactdb", "admin", "password", "jc_contact", "first_name");
-
     }
 
 //    Сборка даты и времени в имя файла

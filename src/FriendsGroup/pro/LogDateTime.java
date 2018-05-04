@@ -16,7 +16,7 @@ public class LogDateTime {
             dateStart = formatStart.parse(dateTimeStart);
             dateEnd = formatEnd.parse(dateTimeEnd);
             response = (dateEnd.getTime() - dateStart.getTime())/1000;
-            System.out.println(dateTimeStart + " - " + dateTimeEnd + " Длительность разговора: " + response);
+//            System.out.println(dateTimeStart + " - " + dateTimeEnd + " Длительность разговора: " + response);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -24,7 +24,7 @@ public class LogDateTime {
     }
 
     boolean relevantDate (String year, String month, String dateCurrent) {
-        System.out.println(dateCurrent.startsWith(year + "-" + month));
+//        System.out.println(dateCurrent.startsWith(year + "-" + month));
         return dateCurrent.startsWith(year + "-" + month);
     }
 }
