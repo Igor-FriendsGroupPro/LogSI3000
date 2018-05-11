@@ -11,7 +11,7 @@ public class LogFile {
     String logFileName;     // Только имя файла
     String logDirectory;    // Директория с файлами
     String nOD;             // Номер нода
-    String dateFile;    // Дата и время создания файла
+    String dateFile;        // Дата и время создания файла
     int numberFile;         // Порядковый номер файла
     int countBloks;         // Количество блоков
     int year;   // год
@@ -24,6 +24,10 @@ public class LogFile {
     String[] DN = new String[1000];     //Номер исходящий
     String[] CN = new String[1000];     //Номер назначения
     String[] SD = new String[1000];     //Дата и время начала звонка
+    int[] yearCall = new int[1000];     // год
+    int[] monthCall = new int[1000];    // месяц
+    int[] dayCall = new int[1000];          // день
+    String[] dateCall = new String[1000];      //Дата звонка
     int[] hourCall = new int[1000];     //Час звонка
     String[] ED = new String[1000];     //Дата и время окончания звонка
     String[] A0 = new String[1000];     //IP вызывающего
@@ -78,14 +82,20 @@ public class LogFile {
                                 DN[countBloks] = strLine.substring(strLine.indexOf("DN") + 4,
                                         strLine.indexOf(">") - 2);
                             }
+
                             break;
                         case "<I100":
                             CN[countBloks] = strLine.substring(strLine.indexOf("CN") + 4, strLine.indexOf(">") - 2);
                             break;
                         case "<I102":
                             SD[countBloks] = strLine.substring(strLine.indexOf("SD") + 4, strLine.indexOf("FL") - 2);
+                            yearCall[countBloks] = Integer.parseInt(SD[countBloks].substring(0, 4));
+                            monthCall[countBloks] = Integer.parseInt(SD[countBloks].substring(5, 7));
+                            dayCall[countBloks] = Integer.parseInt(SD[countBloks].substring(8, 10));
+                            dateCall[countBloks] = SD[countBloks].substring(8, 10) + "."
+                                    + SD[countBloks].substring(5, 7) + "."
+                                    + SD[countBloks].substring(0, 4);
                             hourCall[countBloks] = Integer.parseInt(SD[countBloks].substring(11, 13));
-//                            System.out.println(hourCall[countBloks] + " из " + SD[countBloks]);
                             break;
                         case "<I103":
                             ED[countBloks] = strLine.substring(strLine.indexOf("ED") + 4, strLine.indexOf("FL") - 2);
@@ -98,6 +108,7 @@ public class LogFile {
                             switch (A0[countBloks]) {
                                 case "172.20.212.64": // Входящий от Ростелекома
                                     defiant[countBloks] = 0;
+//                                    System.out.println(hourCall[countBloks] + " из " + SD[countBloks]);
                                     break;
                                     default:
                                         defiant[countBloks] = -1; // Неизвестный

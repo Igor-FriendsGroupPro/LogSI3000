@@ -17,8 +17,9 @@ public class Main {
         String targetPath = ""; // Путь из аргумента
         String targetFile = ""; // Файл для парсинга
         Integer countFiles = 0; // Количество файлов
-        long[] allDuration = new long[32];
-        long[] allcauntCall = new long [32];
+        long allDuration = 0;
+        long allCountCall = 0;
+        int allDays = 0;
 
         // База данных
 //        PostgresDB database = new PostgresDB();
@@ -32,6 +33,8 @@ public class Main {
 //
 //        database.ClearTable();
 
+
+        Day tempDay = new Day(); // Создали первый день
 
         // Перебор всех аргументов и определение задачи
         System.out.println("Передано аргументов: " + args.length);
@@ -49,10 +52,6 @@ public class Main {
                 if (targetPath.length() > 0) {
                     File objectsList[] = new File(targetPath).listFiles(); // Список объектов (файлов и директорий)
 
-                    Day tempDay = new Day(); // Создали новый день
-                    tempDay.setYear(1900);
-                    tempDay.setMonth(1);
-                    tempDay.setDay(30);
 
                     // Перебор всех объектов
                         for (File object : objectsList) {
@@ -63,62 +62,56 @@ public class Main {
                                 // Парсинг лог файла и определение количества блоков
                                 LogFile tempLogFile = new LogFile();
                                 if (tempLogFile.parsigFile(targetPath, targetFile)) {
-                                    // Новый день?
-                                    if (tempDay.getDDMMYYYY().compareTo(tempLogFile.dateFile) != 0) {
-                                        //Вывод старого дня
-                                        System.out.println();
-                                        System.out.println("Дата: " + tempDay.getDDMMYYYY());
-                                        System.out.printf("ЧНН %02d:00-%02d:00 входящих звонков %d",
-                                                tempDay.getcHNN(), tempDay.getcHNN() + 1, tempDay.getCountInCall(tempDay.getcHNN()));
-                                        System.out.println();
-
-                                        for (int i = 0; i < 24; i++) {
-                                            System.out.printf("%02d:00-%02d:00 %d %d %d %d", i, i+1,
-                                                    tempDay.getCountInCall(i), tempDay.getDurationInCall(i),
-                                                    tempDay.getCountOutCall(i), tempDay.getDurationOutCall(i));
-                                            System.out.println();
-                                        }
-
-                                        // Новый день
-                                        tempDay.setDay(tempLogFile.day);
-                                        tempDay.setMonth(tempLogFile.month);
-                                        tempDay.setYear(tempLogFile.year);
-                                        for (int i = 0; i < 24; i++) {
-                                            tempDay.setCountInCall(i, 0);
-                                            tempDay.setCountOutCall(i, 0);
-                                            tempDay.setDurationInCall(i, 0);
-                                            tempDay.setDurationOutCall(i, 0);
-
-                                        }
 
 //                                    // Преребор блоков
-                                        for (int i = 1; i <= tempLogFile.countBloks; i++) {
+                                        for (int i = 0; i <= tempLogFile.countBloks; i++) {
                                             // Анализ
-                                            if (tempLogFile.defiant[i] == 0) {
-                                                // Длительность входящего
-                                                tempDay.setDurationInCall(tempLogFile.hourCall[i],
-                                                        tempLogFile.callDuration[i]);
-                                                tempDay.setCountInCall(tempLogFile.hourCall[i],
-                                                        tempDay.getCountInCall(tempLogFile.hourCall[i])+1);
-                                                System.out.printf("Входящий %02d:00", tempLogFile.hourCall[i]);
-                                                System.out.println();
-
-                                            } else {
-                                                // Длительность исходящего
-                                                tempDay.setDurationOutCall(tempLogFile.hourCall[i],
-                                                        tempLogFile.callDuration[i]);
-                                                tempDay.setCountOutCall(tempLogFile.hourCall[i],
-                                                        tempDay.getCountOutCall(tempLogFile.hourCall[i])+1);
-                                                System.out.printf("Исходящий %02d:00", tempLogFile.hourCall[i]);
-                                                System.out.println();
+//                                            System.out.println(tempLogFile.dateCall[i] + " " + tempLogFile.hourCall[i] + ":00 " + tempLogFile.logFileName);
+                                            // Новый день?
+                                            if (tempDay.getDDMMYYYY().compareTo(tempLogFile.dateCall[i]) != 0) {
+                                                //Вывод старого дня
+                                                tempDay.print();
+                                                allDuration = allDuration + tempDay.getDurationCallInDay();
+                                                allCountCall = allCountCall + tempDay.getCountCallInDay();
+                                                allDays++;
+                                                // Новый день
+                                                tempDay.clear();
+                                                tempDay.setDay(tempLogFile.dayCall[i]);
+                                                tempDay.setMonth(tempLogFile.monthCall[i]);
+                                                tempDay.setYear(tempLogFile.yearCall[i]);
                                             }
-                                        }
 
-                                    }
+//                                            System.out.println("Дата звонка: " + tempLogFile.dateFile + " " + tempLogFile.hourCall[i]);
+                                                if (tempLogFile.defiant[i] == 0) {
+                                                    // Длительность входящего
+                                                    tempDay.setDurationInCall(tempLogFile.hourCall[i],
+                                                            tempLogFile.callDuration[i]);
+                                                    tempDay.setCountInCall(tempLogFile.hourCall[i],
+                                                            tempDay.getCountInCall(tempLogFile.hourCall[i]) + 1);
+//                                                System.out.printf("Входящий %02d:00", tempLogFile.hourCall[i]);
+//                                                System.out.println();
+
+                                                } else {
+                                                    // Длительность исходящего
+                                                    tempDay.setDurationOutCall(tempLogFile.hourCall[i],
+                                                            tempLogFile.callDuration[i]);
+                                                    tempDay.setCountOutCall(tempLogFile.hourCall[i],
+                                                            tempDay.getCountOutCall(tempLogFile.hourCall[i]) + 1);
+//                                                System.out.printf("Исходящий %02d:00", tempLogFile.hourCall[i]);
+//                                                System.out.println();
+                                                }
+
+                                        }
                                 }
                             }
                             countFiles++;
                         }
+                    //Вывод старого дня
+                    tempDay.print();
+                    System.out.println();
+                    System.out.println("Всего дней: " + allDays);
+                    System.out.println("Всего звонков: " + allCountCall + " продолжительностью: " + allDuration);
+
                 }
                 break;
             case 2:

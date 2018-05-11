@@ -14,6 +14,41 @@ public class Day {
     private int[] durationOutCall = new int[24];  //Продолжительность исходящих звонков
     private int[] durationInCall = new int[24];   //Продолжительность входящих звонков
 
+    public void clear() {
+        year = 0;
+        month = 0;
+        day = 0;
+        countCall = 0;
+        durationCall = 0;
+        for (int i = 0; i < 24; i++) {
+            countOutCall[i] = 0;
+            countInCall[i] = 0;
+            durationOutCall[i] = 0;
+            durationInCall[i] = 0;
+        }
+    }
+
+    public void print() {
+        if (day != 0) {
+            System.out.println();
+            System.out.println("Дата: " + getDDMMYYYY());
+            System.out.println("Всего звонков: " + getCountCallInDay() +
+                    " продолжительностью " + getDurationCallInDay() + " сек");
+            System.out.println("Среднее время входящих звонков: " + getAvgDurationCallInDay() + " сек");
+            System.out.printf("ЧНН %02d:00-%02d:00 входящих звонков %d",
+                    getcHNN(), getcHNN() + 1, getCountInCall(getcHNN()));
+            System.out.println();
+
+            for (int clock = 0; clock < 24; clock++) {
+                System.out.printf("%02d:00-%02d:00 %d %d %d %d", clock, clock + 1,
+                        getCountInCall(clock), getDurationInCall(clock),
+                        getCountOutCall(clock), getDurationOutCall(clock));
+                System.out.println();
+            }
+        }
+    }
+
+
     // Геттеры
     public int getYear() {
         return year;
@@ -29,6 +64,9 @@ public class Day {
 
 
     public int getCountCallInDay() {
+        for (int i = 0; i < 24; i++) {
+            countCall = countCall + countInCall[i] + countOutCall[i];
+        }
         return countCall;
     }
 
@@ -45,7 +83,25 @@ public class Day {
     }
 
 
+    public int getAvgDurationCallInDay() {
+        int duration = 0;
+        int count = 0;
+        int avg = 0;
+
+        for (int i = 0; i < 24; i++) {
+            duration = duration + getDurationInCall(i);
+            count = count + getCountInCall(i);
+        }
+        if (count != 0) {
+            avg = duration / count;
+        }
+        return avg;
+    }
+
     public int getDurationCallInDay() {
+        for (int i = 0; i < 24; i++) {
+            durationCall = durationCall + durationInCall[i] + durationOutCall[i];
+        }
         return durationCall;
     }
 
@@ -65,7 +121,10 @@ public class Day {
         int cHNN = 0;   // час наибольшей нагрузки(ЧНН)
         int countCallcHNN = 0;
         for (int i = 0; i < 24; i++) {
-            if (countInCall[i] > countCallcHNN) {cHNN = i;}
+            if (countInCall[i] > countCallcHNN) {
+                countCallcHNN = countInCall[i];
+                cHNN = i;
+            }
         }
         return cHNN;
     }
@@ -103,4 +162,5 @@ public class Day {
     public void setDurationOutCall(int hour, int duration) {
         durationOutCall[hour] = duration;
     }
+
 }
