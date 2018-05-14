@@ -66,11 +66,20 @@ public class Main {
 //                                    // Преребор блоков
                                         for (int i = 0; i <= tempLogFile.countBloks; i++) {
                                             // Анализ
-//                                            System.out.println(tempLogFile.dateCall[i] + " " + tempLogFile.hourCall[i] + ":00 " + tempLogFile.logFileName);
+
+                                            if (tempLogFile.TI[i] == null) {
+                                                System.out.println(targetFile + " " + tempLogFile.SD[i] + " " +
+                                                        tempLogFile.DN[i] + " " + tempLogFile.CN[i] + " " + tempLogFile.callDuration[i] + " - - -");
+                                            }else {
+                                                System.out.println(targetFile + " " + tempLogFile.SD[i] + " " +
+                                                        tempLogFile.DN[i] + " " + tempLogFile.CN[i] + " " + tempLogFile.callDuration[i] + " " +
+                                                        tempLogFile.TI[i] + " " + tempLogFile.PI[i] + " " + tempLogFile.CI113[i]);
+                                            }
+
                                             // Новый день?
                                             if (tempDay.getDDMMYYYY().compareTo(tempLogFile.dateCall[i]) != 0) {
                                                 //Вывод старого дня
-                                                tempDay.print();
+//                                                tempDay.print();
                                                 allDuration = allDuration + tempDay.getDurationCallInDay();
                                                 allCountCall = allCountCall + tempDay.getCountCallInDay();
                                                 allDays++;
@@ -107,7 +116,7 @@ public class Main {
                             countFiles++;
                         }
                     //Вывод старого дня
-                    tempDay.print();
+//                    tempDay.print();
                     System.out.println();
                     System.out.println("Всего дней: " + allDays);
                     System.out.println("Всего звонков: " + allCountCall + " продолжительностью: " + allDuration);

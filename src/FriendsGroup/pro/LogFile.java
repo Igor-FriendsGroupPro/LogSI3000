@@ -24,9 +24,12 @@ public class LogFile {
     String[] DN = new String[1000];     //Номер исходящий
     String[] CN = new String[1000];     //Номер назначения
     String[] SD = new String[1000];     //Дата и время начала звонка
+    String[] TI = new String[1000];     //ХЗ
+    String[] PI = new String[1000];     //ХЗ
+    String[] CI113 = new String[1000];  //ХЗ
     int[] yearCall = new int[1000];     // год
     int[] monthCall = new int[1000];    // месяц
-    int[] dayCall = new int[1000];          // день
+    int[] dayCall = new int[1000];      // день
     String[] dateCall = new String[1000];      //Дата звонка
     int[] hourCall = new int[1000];     //Час звонка
     String[] ED = new String[1000];     //Дата и время окончания звонка
@@ -80,7 +83,7 @@ public class LogFile {
                                 DN[countBloks] = "anonim";
                             } else {
                                 DN[countBloks] = strLine.substring(strLine.indexOf("DN") + 4,
-                                        strLine.indexOf(">") - 2);
+                                        strLine.indexOf(">") - 1);
                             }
 
                             break;
@@ -99,8 +102,16 @@ public class LogFile {
                             break;
                         case "<I103":
                             ED[countBloks] = strLine.substring(strLine.indexOf("ED") + 4, strLine.indexOf("FL") - 2);
-                            LogDateTime tempDT = new LogDateTime();
-                            callDuration[countBloks] = tempDT.duration(SD[countBloks], ED[countBloks]);
+//                            LogDateTime tempDT = new LogDateTime();
+//                            callDuration[countBloks] = tempDT.duration(SD[countBloks], ED[countBloks]);
+                            break;
+                        case "<I113":
+                            TI[countBloks] = strLine.substring(strLine.indexOf("TI") + 4, strLine.indexOf("MI") - 2);
+                            PI[countBloks] = strLine.substring(strLine.indexOf("PI") + 4, strLine.indexOf("CI") - 2);
+                            CI113[countBloks] = strLine.substring(strLine.indexOf("CI") + 4, strLine.indexOf(">") - 2);
+                            break;
+                        case "<I115":
+                            callDuration[countBloks] = Integer.parseInt(strLine.substring(strLine.indexOf("DU") + 4, strLine.indexOf(">") - 2));
                             break;
                         case "<I127":
                             A0[countBloks] = strLine.substring(strLine.indexOf("A0") + 4, strLine.indexOf("A2") - 2);
