@@ -34,13 +34,14 @@ public class Day {
             System.out.println("Дата: " + getDDMMYYYY());
             System.out.println("Всего звонков: " + getCountCallInDay() +
                     " продолжительностью " + getDurationCallInDay() + " сек");
-            System.out.println("Среднее время входящих звонков: " + getAvgDurationCallInDay() + " сек");
+            //System.out.println("Среднее время входящих звонков: " + getAvgDurationCallInDay() + " сек");
             System.out.printf("ЧНН %02d:00-%02d:00 входящих звонков %d",
                     getcHNN(), getcHNN() + 1, getCountInCall(getcHNN()));
             System.out.println();
 
+            System.out.println("Время\tВх\tДл Вх\tИсх\tДл Исх");
             for (int clock = 0; clock < 24; clock++) {
-                System.out.printf("%02d:00-%02d:00 %d %d %d %d", clock, clock + 1,
+                System.out.printf("%02d:00-%02d:00\t%d\t%d\t%d\t%d", clock, clock + 1,
                         getCountInCall(clock), getDurationInCall(clock),
                         getCountOutCall(clock), getDurationOutCall(clock));
                 System.out.println();

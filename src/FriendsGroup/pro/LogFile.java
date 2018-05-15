@@ -21,8 +21,17 @@ public class LogFile {
     // Данные из блока
     int[] SI = new int[1000];           //Номер по порядку
     int[] CI = new int[1000];           //Какой-то внутренний номер
+
+    String[] Direction = new String[1000];     //Направление звонка
+
     String[] DN = new String[1000];     //Номер исходящий
+    String[] DName = new String[1000];     //Имя абонента
+    boolean[] DNSide = new boolean[1000];     //Внутренний абонент
+
     String[] CN = new String[1000];     //Номер назначения
+    String[] CName = new String[1000];     //Имя абонента
+    boolean[] CNSide = new boolean[1000];     //Внутренний абонент
+
     String[] SD = new String[1000];     //Дата и время начала звонка
     String[] TI = new String[1000];     //ХЗ
     String[] PI = new String[1000];     //ХЗ
@@ -81,14 +90,23 @@ public class LogFile {
                             // Обработка анонимных звонков
                             if (strLine.indexOf(">") - strLine.indexOf("DN") == 5) {
                                 DN[countBloks] = "anonim";
+                                DName[countBloks] = "anonim";
+
+//                                DNSide[countBloks] = false;
                             } else {
                                 DN[countBloks] = strLine.substring(strLine.indexOf("DN") + 4,
                                         strLine.indexOf(">") - 1);
+                                Abonent tempAbonent = new Abonent();
+                                DName[countBloks] = tempAbonent.getNameAbonent(DN[countBloks]);
+//                                DNSide[countBloks] = tempAbonent.getSide(DN[countBloks]);
                             }
 
                             break;
                         case "<I100":
                             CN[countBloks] = strLine.substring(strLine.indexOf("CN") + 4, strLine.indexOf(">") - 2);
+                            Abonent tempAbonent = new Abonent();
+                            CName[countBloks] = tempAbonent.getNameAbonent(CN[countBloks]);
+//                            CNSide[countBloks] = tempAbonent.getSide(CN[countBloks]);
                             break;
                         case "<I102":
                             SD[countBloks] = strLine.substring(strLine.indexOf("SD") + 4, strLine.indexOf("FL") - 2);
@@ -102,8 +120,6 @@ public class LogFile {
                             break;
                         case "<I103":
                             ED[countBloks] = strLine.substring(strLine.indexOf("ED") + 4, strLine.indexOf("FL") - 2);
-//                            LogDateTime tempDT = new LogDateTime();
-//                            callDuration[countBloks] = tempDT.duration(SD[countBloks], ED[countBloks]);
                             break;
                         case "<I113":
                             TI[countBloks] = strLine.substring(strLine.indexOf("TI") + 4, strLine.indexOf("MI") - 2);

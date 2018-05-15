@@ -67,19 +67,14 @@ public class Main {
                                         for (int i = 0; i <= tempLogFile.countBloks; i++) {
                                             // Анализ
 
-                                            if (tempLogFile.TI[i] == null) {
-                                                System.out.println(targetFile + " " + tempLogFile.SD[i] + " " +
-                                                        tempLogFile.DN[i] + " " + tempLogFile.CN[i] + " " + tempLogFile.callDuration[i] + " - - -");
-                                            }else {
-                                                System.out.println(targetFile + " " + tempLogFile.SD[i] + " " +
-                                                        tempLogFile.DN[i] + " " + tempLogFile.CN[i] + " " + tempLogFile.callDuration[i] + " " +
-                                                        tempLogFile.TI[i] + " " + tempLogFile.PI[i] + " " + tempLogFile.CI113[i]);
-                                            }
+                                                System.out.println(tempLogFile.SD[i] + "\t" +
+                                                        tempLogFile.DN[i] + "\t" + tempLogFile.CN[i] + "\t" + tempLogFile.callDuration[i] + "\t" +
+                                                        tempLogFile.DName[i] + " > " + tempLogFile.CName[i]);
 
                                             // Новый день?
                                             if (tempDay.getDDMMYYYY().compareTo(tempLogFile.dateCall[i]) != 0) {
                                                 //Вывод старого дня
-//                                                tempDay.print();
+                                                tempDay.print();
                                                 allDuration = allDuration + tempDay.getDurationCallInDay();
                                                 allCountCall = allCountCall + tempDay.getCountCallInDay();
                                                 allDays++;
@@ -97,8 +92,6 @@ public class Main {
                                                             tempLogFile.callDuration[i]);
                                                     tempDay.setCountInCall(tempLogFile.hourCall[i],
                                                             tempDay.getCountInCall(tempLogFile.hourCall[i]) + 1);
-//                                                System.out.printf("Входящий %02d:00", tempLogFile.hourCall[i]);
-//                                                System.out.println();
 
                                                 } else {
                                                     // Длительность исходящего
@@ -106,8 +99,6 @@ public class Main {
                                                             tempLogFile.callDuration[i]);
                                                     tempDay.setCountOutCall(tempLogFile.hourCall[i],
                                                             tempDay.getCountOutCall(tempLogFile.hourCall[i]) + 1);
-//                                                System.out.printf("Исходящий %02d:00", tempLogFile.hourCall[i]);
-//                                                System.out.println();
                                                 }
 
                                         }
@@ -116,10 +107,10 @@ public class Main {
                             countFiles++;
                         }
                     //Вывод старого дня
-//                    tempDay.print();
-                    System.out.println();
-                    System.out.println("Всего дней: " + allDays);
-                    System.out.println("Всего звонков: " + allCountCall + " продолжительностью: " + allDuration);
+                    tempDay.print();
+//                    System.out.println();
+//                    System.out.println("Всего дней: " + allDays);
+//                    System.out.println("Всего звонков: " + allCountCall + " продолжительностью: " + allDuration);
 
                 }
                 break;
