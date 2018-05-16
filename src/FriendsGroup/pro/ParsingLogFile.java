@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class LogFile {
+public class ParsingLogFile {
     // Общие данные
     String logFullFileName; // Полный путь к файлу
     String logFileName;     // Только имя файла
@@ -40,6 +40,7 @@ public class LogFile {
     int[] monthCall = new int[1000];    // месяц
     int[] dayCall = new int[1000];      // день
     String[] dateCall = new String[1000];      //Дата звонка
+    String[] timeCall = new String[1000];      //Дата звонка
     int[] hourCall = new int[1000];     //Час звонка
     String[] ED = new String[1000];     //Дата и время окончания звонка
     String[] A0 = new String[1000];     //IP вызывающего
@@ -82,6 +83,7 @@ public class LogFile {
                     tegLine = strLine.substring(0, 5);
                     switch (tegLine){
                         case "<R200":
+
                             countBloks++;
                             SI[countBloks] = Integer.parseInt(strLine.substring(strLine.indexOf("SI") + 4,
                                     strLine.indexOf("CI") - 2));
@@ -89,8 +91,8 @@ public class LogFile {
                                     strLine.indexOf("FL") - 2));
                             // Обработка анонимных звонков
                             if (strLine.indexOf(">") - strLine.indexOf("DN") == 5) {
-                                DN[countBloks] = "anonim";
-                                DName[countBloks] = "anonim";
+                                DN[countBloks] = "Неизвестный";
+                                DName[countBloks] = "Неизвестный";
 
 //                                DNSide[countBloks] = false;
                             } else {
@@ -107,6 +109,16 @@ public class LogFile {
                             Abonent tempAbonent = new Abonent();
                             CName[countBloks] = tempAbonent.getNameAbonent(CN[countBloks]);
 //                            CNSide[countBloks] = tempAbonent.getSide(CN[countBloks]);
+
+                            // Пропустить блок с переадресацией от ЕДДС на ЦОВ
+                            if (CN[countBloks].compareTo("20093") == 0) {
+                                countBloks--;
+                                while ( strLine.substring(0, 6).compareTo("</R200") != 0 )
+                                {
+                                    strLine = br.readLine();
+                                }
+                            }
+
                             break;
                         case "<I102":
                             SD[countBloks] = strLine.substring(strLine.indexOf("SD") + 4, strLine.indexOf("FL") - 2);
@@ -117,6 +129,7 @@ public class LogFile {
                                     + SD[countBloks].substring(5, 7) + "."
                                     + SD[countBloks].substring(0, 4);
                             hourCall[countBloks] = Integer.parseInt(SD[countBloks].substring(11, 13));
+                            timeCall[countBloks] = SD[countBloks].substring(11, 19);
                             break;
                         case "<I103":
                             ED[countBloks] = strLine.substring(strLine.indexOf("ED") + 4, strLine.indexOf("FL") - 2);

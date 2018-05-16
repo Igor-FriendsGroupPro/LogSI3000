@@ -1,5 +1,9 @@
 package FriendsGroup.pro;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Formatter;
+
 public class Day {
         // Данные суток
     private int year;   // год
@@ -28,25 +32,45 @@ public class Day {
         }
     }
 
-    public void print() {
+    public void print(String nameFile) {
+        Formatter line = new Formatter();
         if (day != 0) {
-            System.out.println();
-            System.out.println("Дата: " + getDDMMYYYY());
-            System.out.println("Всего звонков: " + getCountCallInDay() +
-                    " продолжительностью " + getDurationCallInDay() + " сек");
-            //System.out.println("Среднее время входящих звонков: " + getAvgDurationCallInDay() + " сек");
-            System.out.printf("ЧНН %02d:00-%02d:00 входящих звонков %d",
-                    getcHNN(), getcHNN() + 1, getCountInCall(getcHNN()));
+            IOReport reportFile = new IOReport();
             System.out.println();
 
-            System.out.println("Время\tВх\tДл Вх\tИсх\tДл Исх");
+            line.format("Дата: " + getDDMMYYYY());
+            System.out.println(line.toString());
+//            reportFile.writeLine(nameFile, line.toString(), false);
+//            reportFile.writeLine(nameFile, "\n", false);
+
+            line = new Formatter();
+            line.format("Всего звонков: %d продолжительностью %d сек", getCountCallInDay(), getDurationCallInDay());
+            System.out.println(line.toString());
+//            reportFile.writeLine(nameFile, line.toString(), false);
+//            reportFile.writeLine(nameFile, "\n", false);
+            //System.out.println("Среднее время входящих звонков: " + getAvgDurationCallInDay() + " сек");
+
+            line = new Formatter();
+            line.format("ЧНН %02d:00-%02d:00 входящих звонков %d", getcHNN(), getcHNN() + 1, getCountInCall(getcHNN()));
+            System.out.println(line);
+//            reportFile.writeLine(nameFile, line.toString(), false);
+//            reportFile.writeLine(nameFile, "\n", false);
+
+            line = new Formatter();
+            line.format("Время\tВх\tДл Вх\tИсх\tДл Исх");
+            System.out.println(line);
             for (int clock = 0; clock < 24; clock++) {
-                System.out.printf("%02d:00-%02d:00\t%d\t%d\t%d\t%d", clock, clock + 1,
+                line = new Formatter();
+                line.format("%02d:00-%02d:00\t%d\t%d\t%d\t%d", clock, clock + 1,
                         getCountInCall(clock), getDurationInCall(clock),
                         getCountOutCall(clock), getDurationOutCall(clock));
-                System.out.println();
+                System.out.println(line);
+//                reportFile.writeLine(nameFile, line.toString(), false);
+//                reportFile.writeLine(nameFile, "\n", false);
             }
+
         }
+
     }
 
 
