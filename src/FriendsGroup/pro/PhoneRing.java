@@ -46,16 +46,16 @@ public class PhoneRing {
     // Дата и временя звонка
     public void setDateAndTime(String YYYYDDMMHHmmss) {
         year = Integer.parseInt(YYYYDDMMHHmmss.substring(0, 4));
-        month = Integer.parseInt(YYYYDDMMHHmmss.substring(5, 7));
-        day = Integer.parseInt(YYYYDDMMHHmmss.substring(8, 10));
-        hour = Integer.parseInt(YYYYDDMMHHmmss.substring(11, 13));
-        minute = Integer.parseInt(YYYYDDMMHHmmss.substring(14, 16));
-        second = Integer.parseInt(YYYYDDMMHHmmss.substring(17, 19));
+        month = Integer.parseInt(YYYYDDMMHHmmss.substring(4, 6));
+        day = Integer.parseInt(YYYYDDMMHHmmss.substring(6, 8));
+        hour = Integer.parseInt(YYYYDDMMHHmmss.substring(8, 10));
+        minute = Integer.parseInt(YYYYDDMMHHmmss.substring(10, 12));
+        second = Integer.parseInt(YYYYDDMMHHmmss.substring(12, 14));
 
         Formatter tempString = new Formatter();
-        date = tempString.format("%4d.%2d.%2d", year, month, day).toString();
+        date = tempString.format("%4d.%02d.%02d", year, month, day).toString();
         tempString = new Formatter();
-        time = tempString.format("%2d:%2d:%2d", hour, minute, second).toString();
+        time = tempString.format("%2d:%02d:%02d", hour, minute, second).toString();
     }
 
     // Длительность звонка
@@ -79,8 +79,8 @@ public class PhoneRing {
 
     // Геттеры
     // Внутренний идентификатор звонка в SI3000
-    public long getCalledNumber() {
-        return calledNumber;
+    public long getCallID() {
+        return callID;
     }
 
     // Дата звонка
@@ -138,8 +138,8 @@ public class PhoneRing {
         return ipCN;
     }
 
-    // Направление
-    public String getCalledName() {
+    // Направление звонка
+    public String getDirection() {
         return defiantName + " > " + calledName;
     }
 }

@@ -1,9 +1,6 @@
 package FriendsGroup.pro;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 public class PostgresDB {
 
@@ -11,14 +8,13 @@ public class PostgresDB {
     private String loginDatabase;
     private String passwordDatabase;
     private String urlDatabase;
-    private String nameTableInDatabase;
 
     // Сеттеры
-    public void setNameDatabase(String nameDatabase) {this.nameDatabase = nameDatabase;}
-    public void setLoginDatabase(String loginDatabase) {this.loginDatabase = loginDatabase;}
-    public void setPasswordDatabase(String passwordDatabase) {this.passwordDatabase = passwordDatabase;}
-    public void setnameTableInDatabase(String nameTableInDatabase) {this.nameTableInDatabase = nameTableInDatabase;}
-    public void setUrlDatabase(String urlDatabase) {
+    public void setParametrsDatabase(String loginDatabase, String passwordDatabase) {
+        nameDatabase = "LogSI3000";
+        this.nameDatabase = nameDatabase;
+        this.loginDatabase = loginDatabase;
+        this.passwordDatabase = passwordDatabase;
         urlDatabase = "jdbc:postgresql://localhost:5432/";
         this.urlDatabase = urlDatabase;
     }
@@ -27,68 +23,89 @@ public class PostgresDB {
     public String getNameDatabase() {return nameDatabase;}
     public String getLoginDatabase() {return loginDatabase;}
     public String getPasswordDatabase() {return passwordDatabase;}
-    public String getNameTableInDatabase() {return nameTableInDatabase;}
     public String getUrlDatabase() {return urlDatabase;}
 
-    // Тестирование подключения к базе данных
-    Boolean testDatabase() {
+    // Соединение с базой данных
+    private Connection getDBConnection() {
+        Connection dbConnection = null;
         try {
-            try {
-                Class.forName( "org.postgresql.Driver");
-            } catch (ClassNotFoundException e) {
-                System.out.println("PostgreSQL JDBC Driver не найден.");
-                e.printStackTrace();
-                return false;
-            }
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            System.out.println("PostgreSQL JDBC Driver не найден.");
+            System.out.println(e.getMessage());
+        }
+        try {
+            dbConnection = DriverManager.getConnection(getUrlDatabase() + getNameDatabase(), getLoginDatabase(), getPasswordDatabase());
+            return dbConnection;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return dbConnection;
+    }
 
+    // Создание таблицы
+    public void createTable(String nameTable) throws SQLException {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS " + nameTable + " (" +
+                "ПорядковыйНомерЗвонка NUMERIC(6), " +
+                "ДатаВремяЗвонка timestamp NOT NULL, " +
+                "Год NUMERIC(4), " +
+                "Месяц NUMERIC(2), " +
+                "День NUMERIC(2), " +
+                "Час NUMERIC(2), " +
+                "ВремяЗвонка time, " +
+                "ВызывающийНомер VARCHAR(11), " + // DN
+                "ИмяВызывающегоАбонента VARCHAR, " +
+                "ВызываемыйНомер VARCHAR(11), " +
+                "ИмяВызываемогоАбонента VARCHAR, " +
+                "PRIMARY KEY (ПорядковыйНомерЗвонка))";
+
+        Connection dbConnection = null;
+        Statement statement = null;
+
+            try {
+                dbConnection = getDBConnection();
+                statement = dbConnection.createStatement();
+
+                // выполнить SQL запрос
+                statement.execute(createTableSQL);
+                System.out.println("Таблица " + nameTable + " создана.");
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            } finally {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (dbConnection != null) {
+                    dbConnection.close();
+                }
+            }
+    }
+
+    // Тестирование подключения к базе данных
+    public boolean testDatabase() {
+        try {
             Connection con = DriverManager.getConnection(urlDatabase + nameDatabase, loginDatabase, passwordDatabase);
             try {
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM " + nameTableInDatabase);
-                rs.close();
                 stmt.close();
             } finally {
                 con.close();
+                System.out.println("Доступ к базе успешно проверен!");
                 return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Доступ к базе отсутствует!");
             return false;
         }
     }
 
-    // Инициализация подключения к базе данных
-//    void closeDatabase() {
-//        try {
-//            try {
-//                Class.forName( "org.postgresql.Driver");
-//            } catch (ClassNotFoundException e) {
-//                System.out.println("PostgreSQL JDBC Driver не найден.");
-//                e.printStackTrace();
-//                return false;
-//            }
-//
-//            Connection con = DriverManager.getConnection(urlDatabase + nameDatabase, loginDatabase, passwordDatabase);
-//            try {
-//                Statement stmt = con.createStatement();
-//                stmt.close();
-//                return true;
-//            } finally {
-//                con.close();
-////                return false;
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//    }
-
-    public void ClearTable(){
+    public void clearTable(String nameTable){
         try {
             Connection con = DriverManager.getConnection(urlDatabase + nameDatabase, loginDatabase, passwordDatabase);
             try {
                 Statement stmt = con.createStatement();
-                stmt.executeUpdate("DELETE FROM " + nameTableInDatabase);
+                stmt.executeUpdate("DELETE FROM " + nameTable);
                 stmt.close();
             } finally {
                 con.close();
@@ -98,25 +115,54 @@ public class PostgresDB {
         }
     }
 
-//    String writeDatabase(String lineForWrite) {
-//        try {
-//            Connection con = DriverManager.getConnection(urlDatabase + nameDatabase, loginDatabase, passwordDatabase);
-//            try {
-//                Statement stmt = con.createStatement();
-//                ResultSet rs = stmt.executeQuery("SELECT " + nameColumn + " FROM " + nameTableInDatabase);
-//                stmt.executeUpdate()
-//                while (rs.next()) {
-//                    System.out.println(rs.getString(nameColumn));
-//                }
-//                rs.close();
-//                stmt.close();
-//            } finally {
-//                con.close();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public void writeCall(String nameTable, PhoneRing ring) {
+        String insertTableSQL = "INSERT INTO " + nameTable + " (" +
+                "ПорядковыйНомерЗвонка, " +
+                "ДатаВремяЗвонка, " +
+                "Год, " +
+                "Месяц, " +
+                "День, " +
+                "Час, " +
+                "ВремяЗвонка, " +
+                "ВызывающийНомер, " + // DN
+                "ИмяВызывающегоАбонента, " +
+                "ВызываемыйНомер, " +
+                "ИмяВызываемогоАбонента" +
+                ") VALUES (" +
+                String.valueOf(ring.getCallID()) + ", " +
+                "to_timestamp('" + ring.getDate() + " " +ring.getTime() + "', 'YYYY.MM.DD HH24:MI:SS'), " +
+                String.valueOf(ring.getYear()) + ", " +
+                String.valueOf(ring.getMonth()) + ", " +
+                String.valueOf(ring.getDay()) + ", " +
+                String.valueOf(ring.getHour()) + ", " +
+                String.valueOf(ring.getTime()) + ", " +
+                String.valueOf(ring.getDefiantNumber()) + ", '" +
+                String.valueOf(ring.getDefiantName()) + "', " +
+                String.valueOf(ring.getCalledNumber()) + ", '" +
+                String.valueOf(ring.getCalledName()) + "')";
 
+        // Запись
+        Connection dbConnection = null;
+        Statement statement = null;
+
+        try {
+            dbConnection = getDBConnection();
+            statement = dbConnection.createStatement();
+
+            // выполнить SQL запрос
+            System.out.println(insertTableSQL);
+            statement.execute(insertTableSQL);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+//            if (statement != null) {
+            try {
+                statement.close();
+                dbConnection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
 

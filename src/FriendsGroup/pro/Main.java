@@ -5,6 +5,7 @@ package FriendsGroup.pro;
  */
 
 import java.io.*;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Formatter;
 
@@ -22,18 +23,7 @@ public class Main {
         String reportFile = "";
 
         // База данных
-//        PostgresDB database = new PostgresDB();
-//        database.setUrlDatabase("");
-//        database.setNameDatabase("LogSI3000");
-//        database.setLoginDatabase("admin");
-//        database.setPasswordDatabase("password");
-//        database.setnameTableInDatabase("LogTxt");
-//
-//        System.out.println("База данных доступна " + database.testDatabase());
-//
-//        database.ClearTable();
-
-
+        PostgresDB database = new PostgresDB();
         Day tempDay = new Day(); // Создали первый день
 
         // Перебор всех аргументов и определение задачи
@@ -74,7 +64,8 @@ public class Main {
 
                                             // Новый день?
                                             if (tempDay.getDDMMYYYY().compareTo(tempParsingLogFile.dateCall[i]) != 0) {
-                                                System.out.println(line.format("%4d.%02d" , tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]));
+                                                line = new Formatter();
+//                                                System.out.println(line.format("%d.%02d.%02d", tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i], tempParsingLogFile.dayCall[i]));
 ////                                                if (tempDay.getMonth() != tempParsingLogFile.monthCall[i]) {
 ////                                                    line = new Formatter();
 ////                                                    reportFile = targetPath + "\\" + line.format("%4d.%02d" , tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]).toString();
@@ -92,13 +83,36 @@ public class Main {
 //                                                tempDay.setYear(tempParsingLogFile.yearCall[i]);
                                             }
 
+                                            //Файл
                                             IOReport rFile = new IOReport();
                                             rFile.writeLine(reportFile, tempParsingLogFile.yearCall[i] + "\t" + tempParsingLogFile.monthCall[i] + "\t" + tempParsingLogFile.dayCall[i] + "\t" +
                                                     tempParsingLogFile.hourCall[i] + "\t" + tempParsingLogFile.timeCall[i] + "\t" +
                                                     tempParsingLogFile.DN[i] + "\t" + tempParsingLogFile.CN[i] + "\t" + tempParsingLogFile.callDuration[i] + "\t" +
                                                     tempParsingLogFile.DName[i] + " > " + tempParsingLogFile.CName[i], false);
+
                                             rFile.writeLine(reportFile, "\n", false);
-//                                            System.out.println(tempParsingLogFile.yearCall[i] + "\t" + tempParsingLogFile.monthCall[i] + "\t" + tempParsingLogFile.dayCall[i] + "\t" +
+
+                                            PhoneRing tempPhoneRing = new PhoneRing();
+                                            tempPhoneRing.setCalledAbonent(tempParsingLogFile.CN[i], tempParsingLogFile.A2[i]);
+                                            tempPhoneRing.setDefiantAbonent(tempParsingLogFile.DN[i], tempParsingLogFile.A0[i]);
+                                            tempPhoneRing.setCallID(tempParsingLogFile.SI[i]);
+                                            tempPhoneRing.setDateAndTime(tempParsingLogFile.YYYYDDMMHHmmss[i]);
+                                            tempPhoneRing.setDuration(tempParsingLogFile.callDuration[i]);
+
+                                            // База данных
+                                            line = new Formatter();
+                                            database.setParametrsDatabase("postgres", "postgres");
+                                            try {
+                                                String nameTable = new String();
+                                                nameTable = "Calls" + line.format("%d%02d", tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]);
+                                                database.createTable(nameTable);
+                                                database.writeCall(nameTable, tempPhoneRing);
+                                            } catch (SQLException e) {
+                                                e.printStackTrace();
+                                            }
+
+
+                                                    //                                            System.out.println(tempParsingLogFile.yearCall[i] + "\t" + tempParsingLogFile.monthCall[i] + "\t" + tempParsingLogFile.dayCall[i] + "\t" +
 //                                                    tempParsingLogFile.timeCall[i] + "\t" +
 //                                                    tempParsingLogFile.DN[i] + "\t" + tempParsingLogFile.CN[i] + "\t" + tempParsingLogFile.callDuration[i] + "\t" +
 //                                                    tempParsingLogFile.DName[i] + " > " + tempParsingLogFile.CName[i]);

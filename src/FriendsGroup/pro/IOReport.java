@@ -9,6 +9,7 @@ public class IOReport {
 
         try (FileWriter nFile = new FileWriter(nameFile + ".txt", !newFile)) {
             nFile.write(stringLine);
+            nFile.write("\n");
             nFile.close();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());

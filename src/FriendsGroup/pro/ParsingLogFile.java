@@ -39,8 +39,9 @@ public class ParsingLogFile {
     int[] yearCall = new int[1000];     // год
     int[] monthCall = new int[1000];    // месяц
     int[] dayCall = new int[1000];      // день
+    String[] YYYYDDMMHHmmss = new String[1000];      //Дата звонка
     String[] dateCall = new String[1000];      //Дата звонка
-    String[] timeCall = new String[1000];      //Дата звонка
+    String[] timeCall = new String[1000];      //Время звонка
     int[] hourCall = new int[1000];     //Час звонка
     String[] ED = new String[1000];     //Дата и время окончания звонка
     String[] A0 = new String[1000];     //IP вызывающего
@@ -130,6 +131,15 @@ public class ParsingLogFile {
                                     + SD[countBloks].substring(0, 4);
                             hourCall[countBloks] = Integer.parseInt(SD[countBloks].substring(11, 13));
                             timeCall[countBloks] = SD[countBloks].substring(11, 19);
+
+                            YYYYDDMMHHmmss[countBloks] = SD[countBloks].substring(0, 4) +
+                                    SD[countBloks].substring(5, 7) +
+                                    SD[countBloks].substring(8, 10) +
+                                    SD[countBloks].substring(11, 13) +
+                                    SD[countBloks].substring(14, 16) +
+                                    SD[countBloks].substring(17, 19);
+
+
                             break;
                         case "<I103":
                             ED[countBloks] = strLine.substring(strLine.indexOf("ED") + 4, strLine.indexOf("FL") - 2);
