@@ -55,7 +55,7 @@ public class Main {
                                 // Парсинг лог файла и определение количества блоков
                                 ParsingLogFile tempParsingLogFile = new ParsingLogFile();
                                 if (tempParsingLogFile.parsigFile(targetPath, targetFile)) {
-
+                                    System.out.println("Обработка файла за: " + tempParsingLogFile.dateFile + " звонков: " + tempParsingLogFile.countBloks);
 //                                    // Преребор блоков
                                         for (int i = 0; i <= tempParsingLogFile.countBloks; i++) {
                                             // Анализ
@@ -94,6 +94,7 @@ public class Main {
 
                                             PhoneRing tempPhoneRing = new PhoneRing();
                                             tempPhoneRing.setCalledAbonent(tempParsingLogFile.CN[i], tempParsingLogFile.A2[i]);
+//                                            System.out.println(tempParsingLogFile.DN[i]);
                                             tempPhoneRing.setDefiantAbonent(tempParsingLogFile.DN[i], tempParsingLogFile.A0[i]);
                                             tempPhoneRing.setCallID(tempParsingLogFile.SI[i]);
                                             tempPhoneRing.setDateAndTime(tempParsingLogFile.YYYYDDMMHHmmss[i]);

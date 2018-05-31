@@ -52,11 +52,13 @@ public class PostgresDB {
                 "Месяц NUMERIC(2), " +
                 "День NUMERIC(2), " +
                 "Час NUMERIC(2), " +
-                "ВремяЗвонка time, " +
-                "ВызывающийНомер VARCHAR(11), " + // DN
+                "ВремяЗвонка VARCHAR(8), " +
+                "ДлительностьЗвонка NUMERIC(5), " +
+                "ВызывающийНомер VARCHAR(16), " + // DN
                 "ИмяВызывающегоАбонента VARCHAR, " +
-                "ВызываемыйНомер VARCHAR(11), " +
+                "ВызываемыйНомер VARCHAR(16), " +
                 "ИмяВызываемогоАбонента VARCHAR, " +
+                "НаправлениеЗвонка VARCHAR, " +
                 "PRIMARY KEY (ПорядковыйНомерЗвонка))";
 
         Connection dbConnection = null;
@@ -68,7 +70,7 @@ public class PostgresDB {
 
                 // выполнить SQL запрос
                 statement.execute(createTableSQL);
-                System.out.println("Таблица " + nameTable + " создана.");
+//                System.out.println("Таблица " + nameTable + " создана.");
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             } finally {
@@ -101,18 +103,27 @@ public class PostgresDB {
     }
 
     public void clearTable(String nameTable){
+        Connection dbConnection = null;
+        Statement statement = null;
+
         try {
-            Connection con = DriverManager.getConnection(urlDatabase + nameDatabase, loginDatabase, passwordDatabase);
+            dbConnection = getDBConnection();
+            statement = dbConnection.createStatement();
+
+            // выполнить SQL запрос
+            statement.execute("DELETE FROM " + nameTable);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+//            if (statement != null) {
             try {
-                Statement stmt = con.createStatement();
-                stmt.executeUpdate("DELETE FROM " + nameTable);
-                stmt.close();
-            } finally {
-                con.close();
+                statement.close();
+                dbConnection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
     }
 
     public void writeCall(String nameTable, PhoneRing ring) {
@@ -124,22 +135,26 @@ public class PostgresDB {
                 "День, " +
                 "Час, " +
                 "ВремяЗвонка, " +
+                "ДлительностьЗвонка, " +
                 "ВызывающийНомер, " + // DN
                 "ИмяВызывающегоАбонента, " +
                 "ВызываемыйНомер, " +
-                "ИмяВызываемогоАбонента" +
+                "ИмяВызываемогоАбонента," +
+                "НаправлениеЗвонка" +
                 ") VALUES (" +
                 String.valueOf(ring.getCallID()) + ", " +
-                "to_timestamp('" + ring.getDate() + " " +ring.getTime() + "', 'YYYY.MM.DD HH24:MI:SS'), " +
+                "to_timestamp('" + ring.getDate() + " " + ring.getTime() + "', 'YYYY.MM.DD HH24:MI:SS'), " +
                 String.valueOf(ring.getYear()) + ", " +
                 String.valueOf(ring.getMonth()) + ", " +
                 String.valueOf(ring.getDay()) + ", " +
-                String.valueOf(ring.getHour()) + ", " +
-                String.valueOf(ring.getTime()) + ", " +
+                String.valueOf(ring.getHour()) + ", '" +
+                String.valueOf(ring.getTime()) + "', " +
+                String.valueOf(ring.getDuration()) + ", " +
                 String.valueOf(ring.getDefiantNumber()) + ", '" +
-                String.valueOf(ring.getDefiantName()) + "', " +
+                ring.getDefiantName() + "', " +
                 String.valueOf(ring.getCalledNumber()) + ", '" +
-                String.valueOf(ring.getCalledName()) + "')";
+                ring.getCalledName() + "', '" +
+                ring.getDirection() + "')";
 
         // Запись
         Connection dbConnection = null;
@@ -150,9 +165,12 @@ public class PostgresDB {
             statement = dbConnection.createStatement();
 
             // выполнить SQL запрос
-            System.out.println(insertTableSQL);
+//            System.out.println(insertTableSQL);
             statement.execute(insertTableSQL);
         } catch (SQLException e) {
+            System.out.println(insertTableSQL);
+            //            System.out.println("DN = " + ring.getDefiantNumber() + "    " +
+//                    "CN = " + ring.getCalledNumber());
             System.out.println(e.getMessage());
         } finally {
 //            if (statement != null) {
@@ -160,6 +178,8 @@ public class PostgresDB {
                 statement.close();
                 dbConnection.close();
             } catch (SQLException e) {
+                System.out.println("DN = " + ring.getDefiantNumber() + "    " +
+                        "CN = " + ring.getCalledNumber());
                 e.printStackTrace();
             }
         }

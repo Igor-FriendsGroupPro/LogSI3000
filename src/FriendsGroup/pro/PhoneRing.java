@@ -1,11 +1,8 @@
 package FriendsGroup.pro;
 
-import java.util.ArrayList;
 import java.util.Formatter;
 
 public class PhoneRing {
-
-//    public ArrayList favouritelist = new ArrayList();
 
     // Внутренний идентификатор звонка в SI3000
     private int callID;
@@ -55,7 +52,7 @@ public class PhoneRing {
         Formatter tempString = new Formatter();
         date = tempString.format("%4d.%02d.%02d", year, month, day).toString();
         tempString = new Formatter();
-        time = tempString.format("%2d:%02d:%02d", hour, minute, second).toString();
+        time = tempString.format("%02d:%02d:%02d", hour, minute, second).toString();
     }
 
     // Длительность звонка
@@ -140,6 +137,21 @@ public class PhoneRing {
 
     // Направление звонка
     public String getDirection() {
-        return defiantName + " > " + calledName;
+        String response = "";
+
+//        Number > !Number
+        if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
+            response = "Входящий";
+        }
+//        !Number > Number
+        if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) != 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) == 0) {
+            response = "Исходящий";
+        }
+//        !Number > !Number
+        if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) != 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
+            response = "Внутренний";
+        }
+
+        return response;
     }
 }

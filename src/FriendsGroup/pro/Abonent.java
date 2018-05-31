@@ -190,7 +190,6 @@ public class Abonent {
                 response = " Беловский МР"; break;
             case "29":
                 response = " Киселёвский ГО"; break;
-
             case "30":
                 response = " Ленинск-Кузнецкий ГО"; break;
             case "31":
@@ -299,7 +298,7 @@ public class Abonent {
         return response;
     }
 
-//    String getВirection(String DNumber, String CNumber) {
+//    String getDirection(String DNumber, String CNumber) {
 //        int response;
 //        if (getNameAbonent(DNumber) == "ЦОВ" && getNameAbonent(CNumber) == CNumber) {
 //            response = "ЦОВ > Ростелеком"

@@ -92,7 +92,7 @@ public class ParsingLogFile {
                                     strLine.indexOf("FL") - 2));
                             // Обработка анонимных звонков
                             if (strLine.indexOf(">") - strLine.indexOf("DN") == 5) {
-                                DN[countBloks] = "Неизвестный";
+                                DN[countBloks] = "00000";
                                 DName[countBloks] = "Неизвестный";
 
 //                                DNSide[countBloks] = false;
