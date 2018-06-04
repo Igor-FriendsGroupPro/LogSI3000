@@ -62,6 +62,9 @@ public class PhoneRing {
 
     // Вызывающий абонент
     public void setDefiantAbonent(String number, String ipDN) {
+        if (number.length() > 11){
+            number = number.substring(0, 11);
+        }
         defiantNumber = Long.valueOf(number).longValue();
         defiantName = new Abonent().getNameAbonent(number);
         this.ipDN = ipDN;
