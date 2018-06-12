@@ -184,5 +184,69 @@ public class PostgresDB {
             }
         }
     }
+
+    // Создание таблицы
+    public void createTableAbonent() throws SQLException {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS Subscribers (" +
+                "Номер VARCHAR(16), " + // DN
+                "Абонент VARCHAR, " +
+                "PRIMARY KEY (Номер))";
+
+        Connection dbConnection = null;
+        Statement statement = null;
+
+        try {
+            dbConnection = getDBConnection();
+            statement = dbConnection.createStatement();
+
+            // выполнить SQL запрос
+            statement.execute(createTableSQL);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            if (dbConnection != null) {
+                dbConnection.close();
+            }
+        }
+    }
+
+    public void writeAbonent(String NumberOfAbonent, String NameOfAbonent) {
+        String insertTableSQL = "INSERT INTO Subscribers (" +
+                "Номер, " + // DN
+                "Абонент" +
+                ") VALUES ('" +
+                NumberOfAbonent + "', '" +
+                NameOfAbonent + "')";
+
+        // Запись
+        Connection dbConnection = null;
+        Statement statement = null;
+
+        try {
+            dbConnection = getDBConnection();
+            statement = dbConnection.createStatement();
+
+            // выполнить SQL запрос
+//            System.out.println(insertTableSQL);
+            statement.execute(insertTableSQL);
+        } catch (SQLException e) {
+//            System.out.println(insertTableSQL);
+            //            System.out.println("DN = " + ring.getDefiantNumber() + "    " +
+//                    "CN = " + ring.getCalledNumber());
+//            System.out.println(e.getMessage());
+        } finally {
+//            if (statement != null) {
+            try {
+                statement.close();
+                dbConnection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
 

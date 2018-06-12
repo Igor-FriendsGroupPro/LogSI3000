@@ -62,9 +62,10 @@ public class PhoneRing {
 
     // Вызывающий абонент
     public void setDefiantAbonent(String number, String ipDN) {
-        if (number.length() > 11){
-            number = number.substring(0, 11);
-        }
+//        System.out.println(number);
+//        if (number.length() > 11){
+//            number = number.substring(0, 11);
+//        }
         defiantNumber = Long.valueOf(number).longValue();
         defiantName = new Abonent().getNameAbonent(number);
         this.ipDN = ipDN;
@@ -140,8 +141,12 @@ public class PhoneRing {
 
     // Направление звонка
     public String getDirection() {
-        String response = "";
+        String response = "Неопределено";
 
+//        Number > Number
+        if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) == 0) {
+            response = "Неопределено";
+        }
 //        Number > !Number
         if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
             response = "Входящий";
@@ -154,6 +159,12 @@ public class PhoneRing {
         if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) != 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
             response = "Внутренний";
         }
+
+//        Без сим-карты > !Number
+        if (getDefiantName().compareTo("Без сим-карты") == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
+            response = "Входящий";
+        }
+
 
         return response;
     }

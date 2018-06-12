@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/out</output-path>
     <root id="archive" name="LogSI3000.jar">
       <element id="module-output" name="LogSI3000" />
+      <element id="library" level="project" name="postgresql-42.2.2" />
     </root>
   </artifact>
 </component>

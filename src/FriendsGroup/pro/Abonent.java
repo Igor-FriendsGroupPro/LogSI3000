@@ -1,5 +1,7 @@
 package FriendsGroup.pro;
 
+import java.sql.SQLException;
+
 public class Abonent {
 
     String getMO (String Number){
@@ -48,13 +50,11 @@ public class Abonent {
                         response = "ЦОВ";
                         break;
 
-                    case 901:
                     case 10028:
                     case 10029:
                         response = "ДДС 01 Кемеровский ГО";
                         break;
 
-                    case 902:
                     case 10030:
                     case 10031:
                     case 10063:
@@ -67,7 +67,6 @@ public class Abonent {
                         response = "ДДС 03 Кемеровский ГО";
                         break;
 
-                    case 904:
                     case 10034:
                     case 10035:
                         response = "ДДС 04 Кемеровский ГО";
@@ -83,7 +82,6 @@ public class Abonent {
                         response = "ЦУКС";
                         break;
 
-                    case 905:
                     case 10036:
                     case 10037:
                         response = "ДДС 05 Кемеровский ГО";
@@ -242,14 +240,37 @@ public class Abonent {
                 response = " Яйский МР"; break;
             case "55":
                 response = " Яшкинский МР"; break;
+
+            case "90":
+                switch (Integer.parseInt(Number)) {
+                    case 901:
+                        response = "ДДС 01 Кемеровский ГО";
+                        break;
+
+                    case 902:
+                        response = "ДДС 02 Кемеровский ГО";
+                        break;
+
+                    case 903:
+                        response = "ДДС 03 Кемеровский ГО";
+                        break;
+
+                    case 904:
+                        response = "ДДС 04 Кемеровский ГО";
+                        break;
+
+                    case 905:
+                        response = "ДДС 05 Кемеровский ГО";
+                        break;
+                }
+                break;
         }
     return response;
     }
 
     String getDDS (String Number) {
         String response = "";
-
-        if (Integer.parseInt(Number.substring(0, 2)) >= 22) {
+        if (Integer.parseInt(Number.substring(0, 2)) >= 22 && Integer.parseInt(Number.substring(0, 2)) <= 55) {
             switch (Number.substring(2, 3)){
                 case "0":
                     response = "ЕДДС";
@@ -291,23 +312,34 @@ public class Abonent {
     String getNameAbonent(String Number) {
         String response = Number;
 
-        if (Number.length() <= 5) {
+        if (Number.length() <= 5 && Number.length() > 1) {
             response = getDDS(Number) + getMO(Number);
+
+        }
+
+        if (Number == "0") {
+            response =  "Без сим-карты";
+
+        }
+
+        if (response.compareTo("") == 0) {
+            response = "Не известный";
+        }
+//        System.out.println(Number + " !" + response + "!");
+
+        if (response.compareTo(Number) != 0) {
+            // База данных
+            PostgresDB database = new PostgresDB();
+            database.setParametrsDatabase("postgres", "postgres");
+            try {
+                database.createTableAbonent();
+                database.writeAbonent(Number, response);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return response;
     }
 
-//    String getDirection(String DNumber, String CNumber) {
-//        int response;
-//        if (getNameAbonent(DNumber) == "ЦОВ" && getNameAbonent(CNumber) == CNumber) {
-//            response = "ЦОВ > Ростелеком"
-//        }
-//
-//        if (getNameAbonent(DNumber) != "ЦОВ" && getNameAbonent(CNumber) == CNumber) {
-//            response = 0; // ЦОВ > Ростелеком
-//        }
-//
-//        return response;
-//    }
 }

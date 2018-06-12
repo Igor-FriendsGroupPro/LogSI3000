@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: FriendsGroup.pro.Main
-
+Class-Path: postgresql-42.2.2.jar

@@ -25,6 +25,9 @@ public class Main {
         // База данных
         PostgresDB database = new PostgresDB();
         Day tempDay = new Day(); // Создали первый день
+        database.setParametrsDatabase("postgres", "postgres");
+        // Очистка таблицы
+        database.clearTable("Calls");
 
         // Перебор всех аргументов и определение задачи
         System.out.println("Передано аргументов: " + args.length);
@@ -54,13 +57,17 @@ public class Main {
 
                                 // Парсинг лог файла и определение количества блоков
                                 ParsingLogFile tempParsingLogFile = new ParsingLogFile();
+                                String oldDateFile = "";
                                 if (tempParsingLogFile.parsigFile(targetPath, targetFile)) {
-                                    System.out.println("Обработка файла за: " + tempParsingLogFile.dateFile + " звонков: " + tempParsingLogFile.countBloks);
-//                                    // Преребор блоков
+                                    if (tempParsingLogFile.dateFile.compareTo(oldDateFile) != 0){
+                                        System.out.println("Обработка файла " + targetFile + " за: " + tempParsingLogFile.dateFile);
+                                        oldDateFile = tempParsingLogFile.dateFile;
+                                    }
+                                        // Преребор блоков
                                         for (int i = 0; i <= tempParsingLogFile.countBloks; i++) {
                                             // Анализ
                                             line = new Formatter();
-                                            reportFile = targetPath + "\\" + line.format("%4d.%02d" , tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]).toString();
+//                                            reportFile = targetPath + "\\" + line.format("%4d.%02d" , tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]).toString();
 
                                             // Новый день?
                                             if (tempDay.getDDMMYYYY().compareTo(tempParsingLogFile.dateCall[i]) != 0) {
@@ -84,14 +91,14 @@ public class Main {
                                             }
 
                                             //Файл
-                                            IOReport rFile = new IOReport();
-                                            rFile.writeLine(reportFile, tempParsingLogFile.yearCall[i] + "\t" + tempParsingLogFile.monthCall[i] + "\t" + tempParsingLogFile.dayCall[i] + "\t" +
-                                                    tempParsingLogFile.hourCall[i] + "\t" + tempParsingLogFile.timeCall[i] + "\t" +
-                                                    tempParsingLogFile.DN[i] + "\t" + tempParsingLogFile.CN[i] + "\t" + tempParsingLogFile.callDuration[i] + "\t" +
-                                                    tempParsingLogFile.DName[i] + " > " + tempParsingLogFile.CName[i], false);
-
-                                            rFile.writeLine(reportFile, "\n", false);
-
+//                                            IOReport rFile = new IOReport();
+//                                            rFile.writeLine(reportFile, tempParsingLogFile.yearCall[i] + "\t" + tempParsingLogFile.monthCall[i] + "\t" + tempParsingLogFile.dayCall[i] + "\t" +
+//                                                    tempParsingLogFile.hourCall[i] + "\t" + tempParsingLogFile.timeCall[i] + "\t" +
+//                                                    tempParsingLogFile.DN[i] + "\t" + tempParsingLogFile.CN[i] + "\t" + tempParsingLogFile.callDuration[i] + "\t" +
+//                                                    tempParsingLogFile.DName[i] + " > " + tempParsingLogFile.CName[i], false);
+//
+//                                            rFile.writeLine(reportFile, "\n", false);
+//
                                             PhoneRing tempPhoneRing = new PhoneRing();
                                             tempPhoneRing.setCalledAbonent(tempParsingLogFile.CN[i], tempParsingLogFile.A2[i]);
 //                                            System.out.println(tempParsingLogFile.DN[i]);
@@ -105,7 +112,7 @@ public class Main {
                                             database.setParametrsDatabase("postgres", "postgres");
                                             try {
                                                 String nameTable = new String();
-                                                nameTable = "Calls" + line.format("%d%02d", tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]);
+                                                nameTable = "Calls"; // + line.format("%d%02d", tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]);
                                                 database.createTable(nameTable);
                                                 database.writeCall(nameTable, tempPhoneRing);
                                             } catch (SQLException e) {

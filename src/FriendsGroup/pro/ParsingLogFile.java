@@ -19,38 +19,38 @@ public class ParsingLogFile {
     int day;    // день
 
     // Данные из блока
-    int[] SI = new int[1000];           //Номер по порядку
-    int[] CI = new int[1000];           //Какой-то внутренний номер
+    int[] SI = new int[500];           //Номер по порядку
+    int[] CI = new int[500];           //Какой-то внутренний номер
 
-    String[] Direction = new String[1000];     //Направление звонка
+    String[] Direction = new String[500];     //Направление звонка
 
-    String[] DN = new String[1000];     //Номер исходящий
-    String[] DName = new String[1000];     //Имя абонента
-    boolean[] DNSide = new boolean[1000];     //Внутренний абонент
+    String[] DN = new String[500];     //Номер исходящий
+    String[] DName = new String[500];     //Имя абонента
+    boolean[] DNSide = new boolean[500];     //Внутренний абонент
 
-    String[] CN = new String[1000];     //Номер назначения
-    String[] CName = new String[1000];     //Имя абонента
-    boolean[] CNSide = new boolean[1000];     //Внутренний абонент
+    String[] CN = new String[500];     //Номер назначения
+    String[] CName = new String[500];     //Имя абонента
+    boolean[] CNSide = new boolean[500];     //Внутренний абонент
 
-    String[] SD = new String[1000];     //Дата и время начала звонка
-    String[] TI = new String[1000];     //ХЗ
-    String[] PI = new String[1000];     //ХЗ
-    String[] CI113 = new String[1000];  //ХЗ
-    int[] yearCall = new int[1000];     // год
-    int[] monthCall = new int[1000];    // месяц
-    int[] dayCall = new int[1000];      // день
-    String[] YYYYDDMMHHmmss = new String[1000];      //Дата звонка
-    String[] dateCall = new String[1000];      //Дата звонка
-    String[] timeCall = new String[1000];      //Время звонка
-    int[] hourCall = new int[1000];     //Час звонка
-    String[] ED = new String[1000];     //Дата и время окончания звонка
-    String[] A0 = new String[1000];     //IP вызывающего
-    String[] A2 = new String[1000];     //IP назначения
-    int[] defiant = new int[1000];      //Вызывающий абонент
+    String[] SD = new String[500];     //Дата и время начала звонка
+    String[] TI = new String[500];     //ХЗ
+    String[] PI = new String[500];     //ХЗ
+    String[] CI113 = new String[500];  //ХЗ
+    int[] yearCall = new int[500];     // год
+    int[] monthCall = new int[500];    // месяц
+    int[] dayCall = new int[500];      // день
+    String[] YYYYDDMMHHmmss = new String[500];      //Дата звонка
+    String[] dateCall = new String[500];      //Дата звонка
+    String[] timeCall = new String[500];      //Время звонка
+    int[] hourCall = new int[500];     //Час звонка
+    String[] ED = new String[500];     //Дата и время окончания звонка
+    String[] A0 = new String[500];     //IP вызывающего
+    String[] A2 = new String[500];     //IP назначения
+    int[] defiant = new int[500];      //Вызывающий абонент
                                         //    0 - Ростелеком. Для нас входящий
                                         //    112 - ЦОВ
 
-    int[] callDuration = new int[1000]; //Длительность звонка
+    int[] callDuration = new int[500]; //Длительность звонка
 
     // Разбор файла
     Boolean parsigFile (String directory, String fileName){
@@ -92,8 +92,8 @@ public class ParsingLogFile {
                                     strLine.indexOf("FL") - 2));
                             // Обработка анонимных звонков
                             if (strLine.indexOf(">") - strLine.indexOf("DN") == 5) {
-                                DN[countBloks] = "00000";
-                                DName[countBloks] = "Неизвестный";
+                                DN[countBloks] = "0";
+//                                DName[countBloks] = "0";
 
 //                                DNSide[countBloks] = false;
                             } else {
