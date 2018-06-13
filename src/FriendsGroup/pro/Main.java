@@ -57,12 +57,8 @@ public class Main {
 
                                 // Парсинг лог файла и определение количества блоков
                                 ParsingLogFile tempParsingLogFile = new ParsingLogFile();
-                                String oldDateFile = "";
                                 if (tempParsingLogFile.parsigFile(targetPath, targetFile)) {
-                                    if (tempParsingLogFile.dateFile.compareTo(oldDateFile) != 0){
-                                        System.out.println("Обработка файла " + targetFile + " за: " + tempParsingLogFile.dateFile);
-                                        oldDateFile = tempParsingLogFile.dateFile;
-                                    }
+                                        System.out.println("Обработка даты: " + tempParsingLogFile.dateFile);
                                         // Преребор блоков
                                         for (int i = 0; i <= tempParsingLogFile.countBloks; i++) {
                                             // Анализ
