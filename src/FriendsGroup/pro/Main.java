@@ -10,7 +10,6 @@ import java.text.ParseException;
 import java.util.Formatter;
 
 public class Main {
-//public String[][] block = new String [][];
 
     public static void main(String[] args) throws ParseException {
         boolean showFiles = false; // Показывать файлы
@@ -26,6 +25,9 @@ public class Main {
         PostgresDB database = new PostgresDB();
         Day tempDay = new Day(); // Создали первый день
         database.setParametrsDatabase("postgres", "postgres");
+//        System.out.println(database.getNameOfAbonent("220000"));
+//        System.out.println(database.getIDLastCall());
+
         // Очистка таблицы
         database.clearTable("Calls");
 
@@ -47,8 +49,6 @@ public class Main {
                 if (targetPath.length() > 0) {
                     File objectsList[] = new File(targetPath).listFiles(); // Список объектов (файлов и директорий)
 
-//                    reportFile = targetPath + "\\" + line.format("%4d. %2d" , tempParsingLogFile.year, tempParsingLogFile.month).toString();
-
                     // Перебор всех объектов
                         for (File object : objectsList) {
                             countFiles = 0;
@@ -63,41 +63,14 @@ public class Main {
                                         for (int i = 0; i <= tempParsingLogFile.countBloks; i++) {
                                             // Анализ
                                             line = new Formatter();
-//                                            reportFile = targetPath + "\\" + line.format("%4d.%02d" , tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]).toString();
 
                                             // Новый день?
                                             if (tempDay.getDDMMYYYY().compareTo(tempParsingLogFile.dateCall[i]) != 0) {
                                                 line = new Formatter();
-//                                                System.out.println(line.format("%d.%02d.%02d", tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i], tempParsingLogFile.dayCall[i]));
-////                                                if (tempDay.getMonth() != tempParsingLogFile.monthCall[i]) {
-////                                                    line = new Formatter();
-////                                                    reportFile = targetPath + "\\" + line.format("%4d.%02d" , tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]).toString();
-////                                                }
-//                                                //Вывод старого дня
-////                                                tempDay.print(reportFile);
-//                                                allDuration = allDuration + tempDay.getDurationCallInDay();
-//                                                allCountCall = allCountCall + tempDay.getCountCallInDay();
-//                                                allDays++;
-//
-//                                                // Новый день
-//                                                tempDay.clear();
-//                                                tempDay.setDay(tempParsingLogFile.dayCall[i]);
-//                                                tempDay.setMonth(tempParsingLogFile.monthCall[i]);
-//                                                tempDay.setYear(tempParsingLogFile.yearCall[i]);
                                             }
 
-                                            //Файл
-//                                            IOReport rFile = new IOReport();
-//                                            rFile.writeLine(reportFile, tempParsingLogFile.yearCall[i] + "\t" + tempParsingLogFile.monthCall[i] + "\t" + tempParsingLogFile.dayCall[i] + "\t" +
-//                                                    tempParsingLogFile.hourCall[i] + "\t" + tempParsingLogFile.timeCall[i] + "\t" +
-//                                                    tempParsingLogFile.DN[i] + "\t" + tempParsingLogFile.CN[i] + "\t" + tempParsingLogFile.callDuration[i] + "\t" +
-//                                                    tempParsingLogFile.DName[i] + " > " + tempParsingLogFile.CName[i], false);
-//
-//                                            rFile.writeLine(reportFile, "\n", false);
-//
                                             PhoneRing tempPhoneRing = new PhoneRing();
                                             tempPhoneRing.setCalledAbonent(tempParsingLogFile.CN[i], tempParsingLogFile.A2[i]);
-//                                            System.out.println(tempParsingLogFile.DN[i]);
                                             tempPhoneRing.setDefiantAbonent(tempParsingLogFile.DN[i], tempParsingLogFile.A0[i]);
                                             tempPhoneRing.setCallID(tempParsingLogFile.SI[i]);
                                             tempPhoneRing.setDateAndTime(tempParsingLogFile.YYYYDDMMHHmmss[i]);
@@ -109,45 +82,17 @@ public class Main {
                                             try {
                                                 String nameTable = new String();
                                                 nameTable = "Calls"; // + line.format("%d%02d", tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]);
-                                                database.createTable(nameTable);
+                                                database.createTableCalls(nameTable);
                                                 database.writeCall(nameTable, tempPhoneRing);
                                             } catch (SQLException e) {
                                                 e.printStackTrace();
                                             }
-
-
-                                                    //                                            System.out.println(tempParsingLogFile.yearCall[i] + "\t" + tempParsingLogFile.monthCall[i] + "\t" + tempParsingLogFile.dayCall[i] + "\t" +
-//                                                    tempParsingLogFile.timeCall[i] + "\t" +
-//                                                    tempParsingLogFile.DN[i] + "\t" + tempParsingLogFile.CN[i] + "\t" + tempParsingLogFile.callDuration[i] + "\t" +
-//                                                    tempParsingLogFile.DName[i] + " > " + tempParsingLogFile.CName[i]);
-
-                                            //                                            System.out.println("Дата звонка: " + tempParsingLogFile.dateFile + " " + tempParsingLogFile.hourCall[i]);
-//                                                if (tempParsingLogFile.defiant[i] == 0) {
-//                                                    // Длительность входящего
-//                                                    tempDay.setDurationInCall(tempParsingLogFile.hourCall[i],
-//                                                            tempParsingLogFile.callDuration[i]);
-//                                                    tempDay.setCountInCall(tempParsingLogFile.hourCall[i],
-//                                                            tempDay.getCountInCall(tempParsingLogFile.hourCall[i]) + 1);
-//
-//                                                } else {
-//                                                    // Длительность исходящего
-//                                                    tempDay.setDurationOutCall(tempParsingLogFile.hourCall[i],
-//                                                            tempParsingLogFile.callDuration[i]);
-//                                                    tempDay.setCountOutCall(tempParsingLogFile.hourCall[i],
-//                                                            tempDay.getCountOutCall(tempParsingLogFile.hourCall[i]) + 1);
-//                                                }
 
                                         }
                                 }
                             }
                             countFiles++;
                         }
-                    //Вывод старого дня
-//                    tempDay.print(reportFile);
-//                    System.out.println();
-//                    System.out.println("Всего дней: " + allDays);
-//                    System.out.println("Всего звонков: " + allCountCall + " продолжительностью: " + allDuration);
-
                 }
                 break;
             case 2:
@@ -163,6 +108,7 @@ public class Main {
                 }
                 break;
         }
+
     }
 
 //    Сборка даты и времени в имя файла
@@ -174,5 +120,4 @@ public class Main {
                minute = "00", number = "00??";
         return NOD + year + month + day + hour.toString() + minute + number;
     }
-
 }

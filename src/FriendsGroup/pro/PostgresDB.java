@@ -12,11 +12,12 @@ public class PostgresDB {
     // Сеттеры
     public void setParametrsDatabase(String loginDatabase, String passwordDatabase) {
         nameDatabase = "LogSI3000";
-        this.nameDatabase = nameDatabase;
+//        this.nameDatabase = nameDatabase;
+        urlDatabase = "jdbc:postgresql://localhost:5432/";
+//        this.urlDatabase = urlDatabase;
+
         this.loginDatabase = loginDatabase;
         this.passwordDatabase = passwordDatabase;
-        urlDatabase = "jdbc:postgresql://localhost:5432/";
-        this.urlDatabase = urlDatabase;
     }
 
     // Геттеры
@@ -43,8 +44,58 @@ public class PostgresDB {
         return dbConnection;
     }
 
-    // Создание таблицы
-    public void createTable(String nameTable) throws SQLException {
+    // Выполнение строки SQL
+    private void ExecuteString(String exStringSQL) {
+        // Запись
+        Connection dbConnection = null;
+        Statement statement = null;
+
+        try {
+            dbConnection = getDBConnection();
+            statement = dbConnection.createStatement();
+
+            // выполнить SQL запрос
+            statement.execute(exStringSQL);
+
+        } catch (SQLException e) {
+            System.out.println(exStringSQL);
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                statement.close();
+                dbConnection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Выполнение запроса SQL запроса
+    private ResultSet ExecuteQuery(String exStringSQL) {
+        Connection dbConnection = null;
+        Statement statement = null;
+
+        try {
+            dbConnection = getDBConnection();
+            statement = dbConnection.createStatement();
+
+            // выполнить SQL запрос
+            return statement.executeQuery(exStringSQL);
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                dbConnection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    // Создание таблицы звонков
+    public void createTableCalls(String nameTable) throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS " + nameTable + " (" +
                 "ПорядковыйНомерЗвонка NUMERIC(6), " +
                 "ДатаВремяЗвонка timestamp NOT NULL, " +
@@ -61,26 +112,8 @@ public class PostgresDB {
                 "НаправлениеЗвонка VARCHAR, " +
                 "PRIMARY KEY (ПорядковыйНомерЗвонка))";
 
-        Connection dbConnection = null;
-        Statement statement = null;
-
-            try {
-                dbConnection = getDBConnection();
-                statement = dbConnection.createStatement();
-
-                // выполнить SQL запрос
-                statement.execute(createTableSQL);
-//                System.out.println("Таблица " + nameTable + " создана.");
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            } finally {
-                if (statement != null) {
-                    statement.close();
-                }
-                if (dbConnection != null) {
-                    dbConnection.close();
-                }
-            }
+        // выполнить SQL запрос
+        ExecuteString(createTableSQL);
     }
 
     // Тестирование подключения к базе данных
@@ -102,30 +135,13 @@ public class PostgresDB {
         }
     }
 
+    // Очистка таблицы
     public void clearTable(String nameTable){
-        Connection dbConnection = null;
-        Statement statement = null;
-
-        try {
-            dbConnection = getDBConnection();
-            statement = dbConnection.createStatement();
-
-            // выполнить SQL запрос
-            statement.execute("DELETE FROM " + nameTable);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } finally {
-//            if (statement != null) {
-            try {
-                statement.close();
-                dbConnection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
+        // выполнить SQL запрос
+        ExecuteString("DELETE FROM " + nameTable);
     }
 
+    // Запись звонка
     public void writeCall(String nameTable, PhoneRing ring) {
         String insertTableSQL = "INSERT INTO " + nameTable + " (" +
                 "ПорядковыйНомерЗвонка, " +
@@ -156,63 +172,22 @@ public class PostgresDB {
                 ring.getCalledName() + "', '" +
                 ring.getDirection() + "')";
 
-        // Запись
-        Connection dbConnection = null;
-        Statement statement = null;
-
-        try {
-            dbConnection = getDBConnection();
-            statement = dbConnection.createStatement();
-
-            // выполнить SQL запрос
-//            System.out.println(insertTableSQL);
-            statement.execute(insertTableSQL);
-        } catch (SQLException e) {
-            System.out.println(insertTableSQL);
-            //            System.out.println("DN = " + ring.getDefiantNumber() + "    " +
-//                    "CN = " + ring.getCalledNumber());
-            System.out.println(e.getMessage());
-        } finally {
-//            if (statement != null) {
-            try {
-                statement.close();
-                dbConnection.close();
-            } catch (SQLException e) {
-                System.out.println("DN = " + ring.getDefiantNumber() + "    " +
-                        "CN = " + ring.getCalledNumber());
-                e.printStackTrace();
-            }
-        }
+        // выполнить SQL запрос
+        ExecuteString(insertTableSQL);
     }
 
-    // Создание таблицы
+    // Создание таблицы абонентов
     public void createTableAbonent() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS Subscribers (" +
                 "Номер VARCHAR(16), " + // DN
                 "Абонент VARCHAR, " +
                 "PRIMARY KEY (Номер))";
 
-        Connection dbConnection = null;
-        Statement statement = null;
-
-        try {
-            dbConnection = getDBConnection();
-            statement = dbConnection.createStatement();
-
-            // выполнить SQL запрос
-            statement.execute(createTableSQL);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            if (statement != null) {
-                statement.close();
-            }
-            if (dbConnection != null) {
-                dbConnection.close();
-            }
-        }
+        // выполнить SQL запрос
+        ExecuteString(createTableSQL);
     }
 
+    // Запись абонента
     public void writeAbonent(String NumberOfAbonent, String NameOfAbonent) {
         String insertTableSQL = "INSERT INTO Subscribers (" +
                 "Номер, " + // DN
@@ -221,32 +196,63 @@ public class PostgresDB {
                 NumberOfAbonent + "', '" +
                 NameOfAbonent + "')";
 
-        // Запись
-        Connection dbConnection = null;
-        Statement statement = null;
-
-        try {
-            dbConnection = getDBConnection();
-            statement = dbConnection.createStatement();
-
-            // выполнить SQL запрос
-//            System.out.println(insertTableSQL);
-            statement.execute(insertTableSQL);
-        } catch (SQLException e) {
-//            System.out.println(insertTableSQL);
-            //            System.out.println("DN = " + ring.getDefiantNumber() + "    " +
-//                    "CN = " + ring.getCalledNumber());
-//            System.out.println(e.getMessage());
-        } finally {
-//            if (statement != null) {
-            try {
-                statement.close();
-                dbConnection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        // выполнить SQL запрос
+        ExecuteString(insertTableSQL);
     }
 
+    // Чтение имени абонента
+    public String getNameOfAbonent(String NumberOfAbonent) {
+        String selectTableSQL = "SELECT Абонент FROM subscribers WHERE Номер = '" + NumberOfAbonent + "' ";
+        String response = "Неизвестный";
+        try {
+            // выполнить SQL запрос
+            ResultSet ResultString = ExecuteQuery(selectTableSQL);
+
+            while (ResultString.next()) {
+                response = ResultString.getString("Абонент");
+            }
+            return response;
+
+        } catch (SQLException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+        return response;
+    }
+
+    public long getIDLastCall () {
+        String selectTableSQL = "SELECT MAX(ПорядковыйНомерЗвонка) FROM calls";
+        long response = 0;
+        try {
+            // выполнить SQL запрос
+            ResultSet ResultString = ExecuteQuery(selectTableSQL);
+
+            while (ResultString.next()) {
+                response = Long.parseLong(ResultString.getString("max"));
+            }
+            return response;
+
+        } catch (SQLException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+    return response;
+    }
+
+    public String getDateLastCall () {
+        String selectTableSQL = "SELECT MAX(ДатаВремяЗвонка) FROM calls";
+        String response = "";
+        try {
+            // выполнить SQL запрос
+            ResultSet ResultString = ExecuteQuery(selectTableSQL);
+
+            while (ResultString.next()) {
+                response = ResultString.getString("max");
+            }
+            return response;
+
+        } catch (SQLException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+        return response;
+    }
 }
 

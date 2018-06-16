@@ -7,6 +7,9 @@ public class PhoneRing {
     // Внутренний идентификатор звонка в SI3000
     private int callID;
 
+    // Имя файла источника
+    private String fileName;
+
     // Дата и время начала звонка
     private int year;
     private int month;
@@ -38,6 +41,11 @@ public class PhoneRing {
     // Внутренний идентификатор звонка в SI3000
     public void setCallID(int callID) {
         this.callID = callID;
+    }
+
+    // Имя файла источника
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     // Дата и временя звонка
@@ -82,6 +90,11 @@ public class PhoneRing {
     // Внутренний идентификатор звонка в SI3000
     public long getCallID() {
         return callID;
+    }
+
+    // Внутренний идентификатор звонка в SI3000
+    public String getFileName() {
+        return fileName;
     }
 
     // Дата звонка
