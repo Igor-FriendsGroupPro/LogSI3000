@@ -154,9 +154,7 @@ public class PostgresDB {
                 "ВремяЗвонка, " +
                 "ДлительностьЗвонка, " +
                 "ВызывающийНомер, " + // DN
-                "ИмяВызывающегоАбонента, " +
                 "ВызываемыйНомер, " +
-                "ИмяВызываемогоАбонента," +
                 "НаправлениеЗвонка" +
                 ") VALUES (" +
                 String.valueOf(ring.getCallID()) + ", '" +
@@ -168,10 +166,8 @@ public class PostgresDB {
                 String.valueOf(ring.getHour()) + ", '" +
                 String.valueOf(ring.getTime()) + "', " +
                 String.valueOf(ring.getDuration()) + ", " +
-                String.valueOf(ring.getDefiantNumber()) + ", '" +
-                ring.getDefiantName() + "', " +
+                String.valueOf(ring.getDefiantNumber()) + ", " +
                 String.valueOf(ring.getCalledNumber()) + ", '" +
-                ring.getCalledName() + "', '" +
                 ring.getDirection() + "')";
 
         // выполнить SQL запрос
