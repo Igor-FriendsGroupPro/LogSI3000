@@ -73,6 +73,7 @@ public class Main {
                                             tempPhoneRing.setCalledAbonent(tempParsingLogFile.CN[i], tempParsingLogFile.A2[i]);
                                             tempPhoneRing.setDefiantAbonent(tempParsingLogFile.DN[i], tempParsingLogFile.A0[i]);
                                             tempPhoneRing.setCallID(tempParsingLogFile.SI[i]);
+                                            tempPhoneRing.setFileName(tempParsingLogFile.logFileName);
                                             tempPhoneRing.setDateAndTime(tempParsingLogFile.YYYYDDMMHHmmss[i]);
                                             tempPhoneRing.setDuration(tempParsingLogFile.callDuration[i]);
 

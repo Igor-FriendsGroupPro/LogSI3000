@@ -145,6 +145,7 @@ public class PostgresDB {
     public void writeCall(String nameTable, PhoneRing ring) {
         String insertTableSQL = "INSERT INTO " + nameTable + " (" +
                 "ПорядковыйНомерЗвонка, " +
+                "ИмяЛогФайла, " +
                 "ДатаВремяЗвонка, " +
                 "Год, " +
                 "Месяц, " +
@@ -158,7 +159,8 @@ public class PostgresDB {
                 "ИмяВызываемогоАбонента," +
                 "НаправлениеЗвонка" +
                 ") VALUES (" +
-                String.valueOf(ring.getCallID()) + ", " +
+                String.valueOf(ring.getCallID()) + ", '" +
+                ring.getFileName() + "', " +
                 "to_timestamp('" + ring.getDate() + " " + ring.getTime() + "', 'YYYY.MM.DD HH24:MI:SS'), " +
                 String.valueOf(ring.getYear()) + ", " +
                 String.valueOf(ring.getMonth()) + ", " +
