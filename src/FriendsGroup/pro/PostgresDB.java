@@ -58,8 +58,8 @@ public class PostgresDB {
             statement.execute(exStringSQL);
 
         } catch (SQLException e) {
-            System.out.println(exStringSQL);
-            System.out.println(e.getMessage());
+//            System.out.println(exStringSQL);
+//            System.out.println(e.getMessage());
         } finally {
             try {
                 statement.close();
@@ -98,6 +98,7 @@ public class PostgresDB {
     public void createTableCalls(String nameTable) throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS " + nameTable + " (" +
                 "ПорядковыйНомерЗвонка NUMERIC(6), " +
+                "ИмяЛогФайла VARCHAR, " +
                 "ДатаВремяЗвонка timestamp NOT NULL, " +
                 "Год NUMERIC(4), " +
                 "Месяц NUMERIC(2), " +
@@ -106,9 +107,7 @@ public class PostgresDB {
                 "ВремяЗвонка VARCHAR(8), " +
                 "ДлительностьЗвонка NUMERIC(5), " +
                 "ВызывающийНомер VARCHAR(16), " + // DN
-                "ИмяВызывающегоАбонента VARCHAR, " +
                 "ВызываемыйНомер VARCHAR(16), " +
-                "ИмяВызываемогоАбонента VARCHAR, " +
                 "НаправлениеЗвонка VARCHAR, " +
                 "PRIMARY KEY (ПорядковыйНомерЗвонка))";
 

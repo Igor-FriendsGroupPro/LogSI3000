@@ -323,7 +323,7 @@ public class Abonent {
         }
 
         if (response.compareTo("") == 0) {
-            response = "Неизвестный";
+            response = Number;
         }
 //        System.out.println(Number + " !" + response + "!");
 
