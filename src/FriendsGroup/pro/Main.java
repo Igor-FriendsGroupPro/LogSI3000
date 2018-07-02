@@ -15,6 +15,7 @@ public class Main {
         boolean showFiles = false; // Показывать файлы
         String targetPath = ""; // Путь из аргумента
         String targetFile = ""; // Файл для парсинга
+        String lastFile;        // Последний обработаный файл на момент запуска
         Integer countFiles = 0; // Количество файлов
         long allDuration = 0;
         long allCountCall = 0;
@@ -23,13 +24,17 @@ public class Main {
 
         // База данных
         PostgresDB database = new PostgresDB();
-        Day tempDay = new Day(); // Создали первый день
         database.setParametrsDatabase("postgres", "postgres");
-//        System.out.println(database.getNameOfAbonent("220000"));
-//        System.out.println(database.getIDLastCall());
+        lastFile = database.getFileNameLast();
+        //long lastIDCall = database.getIDLastCall();
+
+        System.out.println(database.existEntry("ИмяЛогФайла", "297732016102412000080"));
+        System.out.println(database.getNameOfAbonent("22200"));
+
+        Day tempDay = new Day(); // Создали первый день
 
         // Очистка таблицы
-        database.clearTable("Calls");
+        // database.clearTable("Calls");
 
         // Перебор всех аргументов и определение задачи
         System.out.println("Передано аргументов: " + args.length);
@@ -45,55 +50,58 @@ public class Main {
                 System.out.println("Директория: " + targetPath);
                 showFiles = true;
 
-                // Проверка наличия пути и вывод результата
-                if (targetPath.length() > 0) {
-                    File objectsList[] = new File(targetPath).listFiles(); // Список объектов (файлов и директорий)
+                File fileList[] = new File(targetPath).listFiles(); // Список объектов (файлов и директорий)
 
-                    // Перебор всех объектов
-                        for (File object : objectsList) {
-                            countFiles = 0;
-                            if (object.isFile()) {
-                                targetFile = object.getName();
+                // Перебор всех объектов
+                for (File object : fileList) {
 
-                                // Парсинг лог файла и определение количества блоков
-                                ParsingLogFile tempParsingLogFile = new ParsingLogFile();
-                                if (tempParsingLogFile.parsigFile(targetPath, targetFile)) {
-                                        System.out.println("Обработка даты: " + tempParsingLogFile.dateFile);
-                                        // Преребор блоков
-                                        for (int i = 0; i <= tempParsingLogFile.countBloks; i++) {
-                                            // Анализ
-                                            line = new Formatter();
+                    countFiles = 0;
+                    if (object.isFile()) {
+                        targetFile = object.getName();
+                        ParsingLogFile tempParsingLogFile = new ParsingLogFile();
+                        tempParsingLogFile.ParsingNameLogFile(targetFile);
 
-                                            // Новый день?
-                                            if (tempDay.getDDMMYYYY().compareTo(tempParsingLogFile.dateCall[i]) != 0) {
-                                                line = new Formatter();
-                                            }
+                        // Обработка отсутствующего файла
+                        if (!database.existEntry("ИмяЛогФайла", tempParsingLogFile.shortLogFileName)
+                                || lastFile.compareTo(tempParsingLogFile.shortLogFileName) == 0) {
 
-                                            PhoneRing tempPhoneRing = new PhoneRing();
-                                            tempPhoneRing.setCalledAbonent(tempParsingLogFile.CN[i], tempParsingLogFile.A2[i]);
-                                            tempPhoneRing.setDefiantAbonent(tempParsingLogFile.DN[i], tempParsingLogFile.A0[i]);
-                                            tempPhoneRing.setCallID(tempParsingLogFile.SI[i]);
-                                            tempPhoneRing.setFileName(tempParsingLogFile.logFileName);
-                                            tempPhoneRing.setDateAndTime(tempParsingLogFile.YYYYDDMMHHmmss[i]);
-                                            tempPhoneRing.setDuration(tempParsingLogFile.callDuration[i]);
+                            if (tempParsingLogFile.parsigFile(targetPath, targetFile)) {
+                                System.out.println("Обработан файл  " + tempParsingLogFile.shortLogFileName + " дата "
+                                        + tempParsingLogFile.dateFile + " блоков " + tempParsingLogFile.countBloks);
 
-                                            // База данных
-                                            line = new Formatter();
-                                            database.setParametrsDatabase("postgres", "postgres");
-                                            try {
-                                                String nameTable = new String();
-                                                nameTable = "Calls"; // + line.format("%d%02d", tempParsingLogFile.yearCall[i], tempParsingLogFile.monthCall[i]);
-                                                database.createTableCalls(nameTable);
-                                                database.writeCall(nameTable, tempPhoneRing);
-                                            } catch (SQLException e) {
-                                                e.printStackTrace();
-                                            }
+                                // Преребор блоков
+                                for (int i = 0; i <= tempParsingLogFile.countBloks; i++) {
+//                                    System.out.println("ПорядковыйНомерЗвонка " + String.valueOf(tempParsingLogFile.SI[i]));
+                                    if (!database.existEntry("ПорядковыйНомерЗвонка", String.valueOf(tempParsingLogFile.SI[i]))) {
 
+                                        // Создание отдельного звонка
+                                        PhoneRing tempPhoneRing = new PhoneRing();
+                                        tempPhoneRing.setCalledAbonent(tempParsingLogFile.CN[i], tempParsingLogFile.A2[i]);
+                                        tempPhoneRing.setDefiantAbonent(tempParsingLogFile.DN[i], tempParsingLogFile.A0[i]);
+                                        tempPhoneRing.setCallID(tempParsingLogFile.SI[i]);
+                                        tempPhoneRing.setFileName(tempParsingLogFile.shortLogFileName);
+                                        tempPhoneRing.setDateAndTime(tempParsingLogFile.YYYYDDMMHHmmss[i]);
+                                        tempPhoneRing.setDuration(tempParsingLogFile.callDuration[i]);
+
+                                        //System.out.println("ID звонка  " + tempPhoneRing.getCallID());
+
+                                        // База данных таблица звонков
+                                        try {
+                                            //System.out.println("Запись в базу данных");
+                                            database.createTableCalls("Calls");
+                                            database.writeCall("Calls", tempPhoneRing);
+                                        } catch (SQLException e) {
+                                            e.printStackTrace();
                                         }
+
+                                    }
                                 }
                             }
-                            countFiles++;
-                        }
+
+                        } else {
+                            System.out.println("Данные из файла " + tempParsingLogFile.shortLogFileName + " уже есть в базе данных");
+                        }// Обработка отсутствующего файла завершена
+                    }
                 }
                 break;
             case 2:
@@ -109,16 +117,6 @@ public class Main {
                 }
                 break;
         }
-
     }
 
-//    Сборка даты и времени в имя файла
-    static String compileFileName(String dateTime) {
-        Integer hour = Integer.parseInt(dateTime.substring(11, 13)) - 2; // Час предшествующий
-
-        String NOD = "29773";
-        String year = dateTime.substring(6, 10), month = dateTime.substring(3, 5), day = dateTime.substring(0, 2),
-               minute = "00", number = "00??";
-        return NOD + year + month + day + hour.toString() + minute + number;
-    }
 }

@@ -44,22 +44,24 @@ public class PostgresDB {
         return dbConnection;
     }
 
-    // Выполнение строки SQL
+    // Выполнение строки SQL без возврата результата
     private void ExecuteString(String exStringSQL) {
         // Запись
         Connection dbConnection = null;
         Statement statement = null;
 
+//        System.out.println(exStringSQL);
+
         try {
             dbConnection = getDBConnection();
             statement = dbConnection.createStatement();
 
-            // выполнить SQL запрос
+            // выполнить SQL строку
             statement.execute(exStringSQL);
+            dbConnection.close();
 
         } catch (SQLException e) {
-//            System.out.println(exStringSQL);
-//            System.out.println(e.getMessage());
+            System.out.println("Ошибка: " + e.getMessage());
         } finally {
             try {
                 statement.close();
@@ -70,28 +72,31 @@ public class PostgresDB {
         }
     }
 
-    // Выполнение запроса SQL запроса
-    private ResultSet ExecuteQuery(String exStringSQL) {
-        Connection dbConnection = null;
-        Statement statement = null;
+    // Выполнение запроса SQL запроса с получением результата
+    private String ExecuteQuery(String exStringSQL) {
+        Connection dbConnection;
+        Statement statement;
+        String response = null;
 
         try {
+            // Соединение с базой данных
             dbConnection = getDBConnection();
             statement = dbConnection.createStatement();
 
             // выполнить SQL запрос
-            return statement.executeQuery(exStringSQL);
+            ResultSet resultString = statement.executeQuery(exStringSQL);
+            while (resultString.next()) {
+                response = resultString.getString("response");
+            }
+
+            dbConnection.close();
+            return response;
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Ошибка: " + e.getMessage());
         }
-        return null;
+        return response;
+
     }
 
     // Создание таблицы звонков
@@ -140,7 +145,7 @@ public class PostgresDB {
         ExecuteString("DELETE FROM " + nameTable);
     }
 
-    // Запись звонка
+    // Запись звонка в базу данных
     public void writeCall(String nameTable, PhoneRing ring) {
         String insertTableSQL = "INSERT INTO " + nameTable + " (" +
                 "ПорядковыйНомерЗвонка, " +
@@ -165,8 +170,8 @@ public class PostgresDB {
                 String.valueOf(ring.getHour()) + ", '" +
                 String.valueOf(ring.getTime()) + "', " +
                 String.valueOf(ring.getDuration()) + ", " +
-                String.valueOf(ring.getDefiantNumber()) + ", " +
-                String.valueOf(ring.getCalledNumber()) + ", '" +
+                ring.getDefiantNumber() + ", " +
+                ring.getCalledNumber() + ", '" +
                 ring.getDirection() + "')";
 
         // выполнить SQL запрос
@@ -199,57 +204,22 @@ public class PostgresDB {
 
     // Чтение имени абонента
     public String getNameOfAbonent(String NumberOfAbonent) {
-        String selectTableSQL = "SELECT Абонент FROM subscribers WHERE Номер = '" + NumberOfAbonent + "' ";
-        String response = "Неизвестный";
-        try {
-            // выполнить SQL запрос
-            ResultSet ResultString = ExecuteQuery(selectTableSQL);
-
-            while (ResultString.next()) {
-                response = ResultString.getString("Абонент");
-            }
-            return response;
-
-        } catch (SQLException e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
-        return response;
+        // null если нет в базе данных
+        return ExecuteQuery("SELECT Абонент AS response FROM subscribers WHERE Номер = '" + NumberOfAbonent + "'");
     }
 
     public long getIDLastCall () {
-        String selectTableSQL = "SELECT MAX(ПорядковыйНомерЗвонка) FROM calls";
-        long response = 0;
-        try {
-            // выполнить SQL запрос
-            ResultSet ResultString = ExecuteQuery(selectTableSQL);
-
-            while (ResultString.next()) {
-                response = Long.parseLong(ResultString.getString("max"));
-            }
-            return response;
-
-        } catch (SQLException e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
-    return response;
+        String response = ExecuteQuery("SELECT MAX(ПорядковыйНомерЗвонка) AS response FROM calls");
+        return Long.parseLong(response);
     }
 
-    public String getDateLastCall () {
-        String selectTableSQL = "SELECT MAX(ДатаВремяЗвонка) FROM calls";
-        String response = "";
-        try {
-            // выполнить SQL запрос
-            ResultSet ResultString = ExecuteQuery(selectTableSQL);
+    public String getFileNameLast () {
+        return ExecuteQuery("SELECT MAX(ИмяЛогФайла) AS response FROM calls");
+    }
 
-            while (ResultString.next()) {
-                response = ResultString.getString("max");
-            }
-            return response;
-
-        } catch (SQLException e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
-        return response;
+    public boolean existEntry (String column, String value) {
+        String response = ExecuteQuery("SELECT EXISTS( SELECT " + column + " FROM calls WHERE " + column + " = '" + value + "') AS response");
+        return response.compareTo("t") == 0;
     }
 }
 

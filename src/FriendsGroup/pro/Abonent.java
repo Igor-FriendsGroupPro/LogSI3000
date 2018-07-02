@@ -312,11 +312,16 @@ public class Abonent {
     String getNameAbonent(String Number) {
         String response = Number;
 
-        if (Number.length() <= 5 && Number.length() > 1) {
+        // База данных
+        PostgresDB database = new PostgresDB();
+        database.setParametrsDatabase("postgres", "postgres");
+        database.getNameOfAbonent(Number);
+
+        /*        if (Number.length() <= 5 && Number.length() > 1) {
             response = getDDS(Number) + getMO(Number);
 
         }
-
+*/
         if (Number == "0") {
             response =  "Без сим-карты";
 
@@ -325,19 +330,7 @@ public class Abonent {
         if (response.compareTo("") == 0) {
             response = Number;
         }
-//        System.out.println(Number + " !" + response + "!");
 
-        if (response.compareTo(Number) != 0) {
-            // База данных
-            PostgresDB database = new PostgresDB();
-            database.setParametrsDatabase("postgres", "postgres");
-            try {
-                database.createTableAbonent();
-                database.writeAbonent(Number, response);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 
         return response;
     }

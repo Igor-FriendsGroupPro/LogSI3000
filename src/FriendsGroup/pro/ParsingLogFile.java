@@ -9,6 +9,7 @@ public class ParsingLogFile {
     // Общие данные
     String logFullFileName; // Полный путь к файлу
     String logFileName;     // Только имя файла
+    String shortLogFileName;// Только короткое имя файла без .txt
     String logDirectory;    // Директория с файлами
     String nOD;             // Номер нода
     String dateFile;        // Дата и время создания файла
@@ -19,7 +20,7 @@ public class ParsingLogFile {
     int day;    // день
 
     // Данные из блока
-    int[] SI = new int[500];           //Номер по порядку
+    int[] SI = new int[500];           //ID звонка
     int[] CI = new int[500];           //Какой-то внутренний номер
 
     String[] Direction = new String[500];     //Направление звонка
@@ -88,8 +89,8 @@ public class ParsingLogFile {
                             countBloks++;
                             SI[countBloks] = Integer.parseInt(strLine.substring(strLine.indexOf("SI") + 4,
                                     strLine.indexOf("CI") - 2));
-                            CI[countBloks] = Integer.parseInt(strLine.substring(strLine.indexOf("CI") + 4,
-                                    strLine.indexOf("FL") - 2));
+//                            CI[countBloks] = Integer.parseInt(strLine.substring(strLine.indexOf("CI") + 4,
+//                                    strLine.indexOf("FL") - 2));
                             // Обработка анонимных звонков
                             if (strLine.indexOf(">") - strLine.indexOf("DN") == 5) {
                                 DN[countBloks] = "0";
@@ -141,7 +142,7 @@ public class ParsingLogFile {
 
 
                             break;
-                        case "<I103":
+/*                        case "<I103":
                             ED[countBloks] = strLine.substring(strLine.indexOf("ED") + 4, strLine.indexOf("FL") - 2);
                             break;
                         case "<I113":
@@ -149,13 +150,14 @@ public class ParsingLogFile {
                             PI[countBloks] = strLine.substring(strLine.indexOf("PI") + 4, strLine.indexOf("CI") - 2);
                             CI113[countBloks] = strLine.substring(strLine.indexOf("CI") + 4, strLine.indexOf(">") - 2);
                             break;
+*/
                         case "<I115":
                             callDuration[countBloks] = Integer.parseInt(strLine.substring(strLine.indexOf("DU") + 4, strLine.indexOf(">") - 2));
                             break;
                         case "<I127":
                             A0[countBloks] = strLine.substring(strLine.indexOf("A0") + 4, strLine.indexOf("A2") - 2);
 
-                            switch (A0[countBloks]) {
+/*                            switch (A0[countBloks]) {
                                 case "172.20.212.64": // Входящий от Ростелекома
                                     defiant[countBloks] = 0;
 //                                    System.out.println(hourCall[countBloks] + " из " + SD[countBloks]);
@@ -164,7 +166,7 @@ public class ParsingLogFile {
                                         defiant[countBloks] = -1; // Неизвестный
                                         break;
                             }
-
+*/
                             A2[countBloks] = strLine.substring(strLine.indexOf("A2") + 4, strLine.indexOf(">") - 2);
                             break;
                     }
@@ -182,4 +184,21 @@ public class ParsingLogFile {
 
     }
 
+    void ParsingNameLogFile (String fileName) {
+
+        if ((fileName.length() == 25) && fileName.endsWith(".txt")) {
+            nOD = fileName.substring(0, 5);
+            logFileName = fileName;
+            shortLogFileName = fileName.substring(0, 21);
+            year = Integer.parseInt(logFileName.substring(5, 9));
+            month = Integer.parseInt(logFileName.substring(9, 11));
+            day = Integer.parseInt(logFileName.substring(11, 13));
+            numberFile = Integer.parseInt(logFileName.substring(17, 21));
+
+            dateFile = logFileName.substring(11, 13) + "." +
+                    logFileName.substring(9, 11) + "." +
+                    logFileName.substring(5, 9);
+        }
+
+    }
 }

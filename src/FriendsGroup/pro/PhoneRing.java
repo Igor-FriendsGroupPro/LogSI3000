@@ -25,12 +25,12 @@ public class PhoneRing {
     private int duration;
 
     // Вызывающий абонент DN, A0
-    private long defiantNumber;
+    private String defiantNumber;
     private String defiantName;
     private String ipDN;        // IP адрес
 
     // Вызываемый абонент СN, A2
-    private long calledNumber;
+    private String calledNumber;
     private String calledName;
     private String ipCN;        // IP адрес
 
@@ -70,18 +70,20 @@ public class PhoneRing {
 
     // Вызывающий абонент
     public void setDefiantAbonent(String number, String ipDN) {
-//        System.out.println(number);
-//        if (number.length() > 11){
-//            number = number.substring(0, 11);
-//        }
-        defiantNumber = Long.valueOf(number).longValue();
+        if (number.length() > 16) {
+            number = number.substring(0, 15);
+        }
+        defiantNumber = number;
         defiantName = new Abonent().getNameAbonent(number);
         this.ipDN = ipDN;
     }
 
     // Вызываемый абонент
     public void setCalledAbonent(String number, String ipCN) {
-        calledNumber = Long.valueOf(number).longValue();
+        if (number.length() > 16) {
+            number = number.substring(0, 15);
+        }
+        calledNumber = number;
         calledName = new Abonent().getNameAbonent(number);
         this.ipCN = ipCN;
     }
@@ -131,7 +133,7 @@ public class PhoneRing {
     }
 
     // Вызывающий абонент
-    public long getDefiantNumber() {
+    public String getDefiantNumber() {
         return defiantNumber;
     }
     public String getDefiantName() {
@@ -142,7 +144,7 @@ public class PhoneRing {
     }
 
     // Вызываемый абонент
-    public long getCalledNumber() {
+    public String getCalledNumber() {
         return calledNumber;
     }
     public String getCalledName() {
