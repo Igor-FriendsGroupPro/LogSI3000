@@ -173,14 +173,15 @@ public class PostgresDB {
                 String.valueOf(ring.getDay()) + ", " +
                 String.valueOf(ring.getHour()) + ", '" +
                 String.valueOf(ring.getTime()) + "', " +
-                String.valueOf(ring.getDuration()) + ", " +
-                ring.getDefiantNumber() + ", " +
-                ring.getCalledNumber() + ", '" +
-                ring.getDirection() + ", '" +
-                ring.getCalledName() + ", '" +
+                String.valueOf(ring.getDuration()) + ", '" +
+                ring.getDefiantNumber() + "', '" +
+                ring.getCalledNumber() + "', '" +
+                ring.getDirection() + "', '" +
+                ring.getCalledName() + "', '" +
                 ring.getDestinationName() + "')";
 
         // выполнить SQL запрос
+        //System.out.println(insertTableSQL);
         ExecuteString(insertTableSQL);
     }
 
@@ -209,9 +210,9 @@ public class PostgresDB {
     }
 
     // Чтение имени абонента
-    public String getNameOfAbonent(String NumberOfAbonent) {
+    String getNameOfAbonent(String NumberOfAbonent) {
         // null если нет в базе данных
-        return ExecuteQuery("SELECT SubscriberName AS response FROM subscribers WHERE Номер = '" + NumberOfAbonent + "'");
+        return ExecuteQuery("SELECT SubscriberName AS response FROM subscribers WHERE SubscriberNumber = '" + NumberOfAbonent + "'");
     }
 
     public long getIDLastCall (String nameTable) {
