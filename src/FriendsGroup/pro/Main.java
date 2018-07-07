@@ -20,21 +20,24 @@ public class Main {
         long allDuration = 0;
         long allCountCall = 0;
         int allDays = 0;
-        String reportFile = "";
+        String nameTable = "calls";
+        String nameTableSubscribers = "subscribers";
 
         // База данных
         PostgresDB database = new PostgresDB();
         database.setParametrsDatabase("postgres", "postgres");
-        lastFile = database.getFileNameLast();
+        // Создание таблицы
+        try {
+            database.createTableCalls(nameTable);
+            database.createTableAbonent(nameTableSubscribers);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        lastFile = database.getFileNameLast(nameTable);
         //long lastIDCall = database.getIDLastCall();
-
-        System.out.println(database.existEntry("ИмяЛогФайла", "297732016102412000080"));
-        System.out.println(database.getNameOfAbonent("22200"));
 
         Day tempDay = new Day(); // Создали первый день
 
-        // Очистка таблицы
-        // database.clearTable("Calls");
 
         // Перебор всех аргументов и определение задачи
         System.out.println("Передано аргументов: " + args.length);
@@ -62,7 +65,7 @@ public class Main {
                         tempParsingLogFile.ParsingNameLogFile(targetFile);
 
                         // Обработка отсутствующего файла
-                        if (!database.existEntry("ИмяЛогФайла", tempParsingLogFile.shortLogFileName)
+                        if (!database.existEntry("NameLogFile", tempParsingLogFile.shortLogFileName, nameTable)
                                 || lastFile.compareTo(tempParsingLogFile.shortLogFileName) == 0) {
 
                             if (tempParsingLogFile.parsigFile(targetPath, targetFile)) {
@@ -72,12 +75,12 @@ public class Main {
                                 // Преребор блоков
                                 for (int i = 0; i <= tempParsingLogFile.countBloks; i++) {
 //                                    System.out.println("ПорядковыйНомерЗвонка " + String.valueOf(tempParsingLogFile.SI[i]));
-                                    if (!database.existEntry("ПорядковыйНомерЗвонка", String.valueOf(tempParsingLogFile.SI[i]))) {
+                                    if (!database.existEntry("CallID", String.valueOf(tempParsingLogFile.SI[i]), nameTable)) {
 
                                         // Создание отдельного звонка
                                         PhoneRing tempPhoneRing = new PhoneRing();
-                                        tempPhoneRing.setCalledAbonent(tempParsingLogFile.CN[i], tempParsingLogFile.A2[i]);
-                                        tempPhoneRing.setDefiantAbonent(tempParsingLogFile.DN[i], tempParsingLogFile.A0[i]);
+                                        tempPhoneRing.setCalledName(tempParsingLogFile.CN[i], tempParsingLogFile.A2[i]);
+                                        tempPhoneRing.setDestinationName(tempParsingLogFile.DN[i], tempParsingLogFile.A0[i]);
                                         tempPhoneRing.setCallID(tempParsingLogFile.SI[i]);
                                         tempPhoneRing.setFileName(tempParsingLogFile.shortLogFileName);
                                         tempPhoneRing.setDateAndTime(tempParsingLogFile.YYYYDDMMHHmmss[i]);
@@ -86,13 +89,7 @@ public class Main {
                                         //System.out.println("ID звонка  " + tempPhoneRing.getCallID());
 
                                         // База данных таблица звонков
-                                        try {
-                                            //System.out.println("Запись в базу данных");
-                                            database.createTableCalls("Calls");
-                                            database.writeCall("Calls", tempPhoneRing);
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
+                                        database.writeCall(nameTable, tempPhoneRing);
 
                                     }
                                 }

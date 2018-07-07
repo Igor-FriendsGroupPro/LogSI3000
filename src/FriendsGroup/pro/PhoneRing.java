@@ -26,7 +26,7 @@ public class PhoneRing {
 
     // Вызывающий абонент DN, A0
     private String defiantNumber;
-    private String defiantName;
+    private String destinationName;
     private String ipDN;        // IP адрес
 
     // Вызываемый абонент СN, A2
@@ -69,17 +69,17 @@ public class PhoneRing {
     }
 
     // Вызывающий абонент
-    public void setDefiantAbonent(String number, String ipDN) {
+    public void setDestinationName(String number, String ipDN) {
         if (number.length() > 16) {
             number = number.substring(0, 15);
         }
         defiantNumber = number;
-        defiantName = new Abonent().getNameAbonent(number);
+        destinationName = new Abonent().getNameAbonent(number);
         this.ipDN = ipDN;
     }
 
     // Вызываемый абонент
-    public void setCalledAbonent(String number, String ipCN) {
+    public void setCalledName(String number, String ipCN) {
         if (number.length() > 16) {
             number = number.substring(0, 15);
         }
@@ -136,8 +136,8 @@ public class PhoneRing {
     public String getDefiantNumber() {
         return defiantNumber;
     }
-    public String getDefiantName() {
-        return defiantName;
+    public String getDestinationName() {
+        return destinationName;
     }
     public String getIPDN() {
         return ipDN;
@@ -158,25 +158,25 @@ public class PhoneRing {
     public String getDirection() {
         String response = "Неопределено";
 
-//        Number > Number
-        if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) == 0) {
+//        Number >>> Number
+        if (getDestinationName().compareTo(String.valueOf(getDefiantNumber())) == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) == 0) {
             response = "Неопределено";
         }
-//        Number > !Number
-        if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
+//        Number >>> !Number
+        if (getDestinationName().compareTo(String.valueOf(getDefiantNumber())) == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
             response = "Входящий";
         }
-//        !Number > Number
-        if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) != 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) == 0) {
+//        !Number >>> Number
+        if (getDestinationName().compareTo(String.valueOf(getDefiantNumber())) != 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) == 0) {
             response = "Исходящий";
         }
-//        !Number > !Number
-        if (getDefiantName().compareTo(String.valueOf(getDefiantNumber())) != 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
+//        !Number >>> !Number
+        if (getDestinationName().compareTo(String.valueOf(getDefiantNumber())) != 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
             response = "Внутренний";
         }
 
-//        Без сим-карты > !Number
-        if (getDefiantName().compareTo("Без сим-карты") == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
+//        Без сим-карты >>> !Number
+        if (getDestinationName().compareTo("Без сим-карты") == 0 && getCalledName().compareTo(String.valueOf(getCalledNumber())) != 0) {
             response = "Входящий";
         }
 

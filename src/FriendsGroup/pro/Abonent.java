@@ -310,24 +310,18 @@ public class Abonent {
     }
 
     String getNameAbonent(String Number) {
-        String response = Number;
+        String response;
 
         // База данных
         PostgresDB database = new PostgresDB();
         database.setParametrsDatabase("postgres", "postgres");
-        database.getNameOfAbonent(Number);
+        response = database.getNameOfAbonent(Number);
 
-        /*        if (Number.length() <= 5 && Number.length() > 1) {
-            response = getDDS(Number) + getMO(Number);
-
-        }
-*/
-        if (Number == "0") {
+        if (Number.compareTo("0") == 0) {
             response =  "Без сим-карты";
-
         }
 
-        if (response.compareTo("") == 0) {
+        if (response == null || response.isEmpty()) {
             response = Number;
         }
 

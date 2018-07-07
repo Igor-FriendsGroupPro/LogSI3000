@@ -102,19 +102,21 @@ public class PostgresDB {
     // Создание таблицы звонков
     public void createTableCalls(String nameTable) throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS " + nameTable + " (" +
-                "ПорядковыйНомерЗвонка NUMERIC(6), " +
-                "ИмяЛогФайла VARCHAR, " +
-                "ДатаВремяЗвонка timestamp NOT NULL, " +
-                "Год NUMERIC(4), " +
-                "Месяц NUMERIC(2), " +
-                "День NUMERIC(2), " +
-                "Час NUMERIC(2), " +
-                "ВремяЗвонка VARCHAR(8), " +
-                "ДлительностьЗвонка NUMERIC(5), " +
-                "ВызывающийНомер VARCHAR(16), " + // DN
-                "ВызываемыйНомер VARCHAR(16), " +
-                "НаправлениеЗвонка VARCHAR, " +
-                "PRIMARY KEY (ПорядковыйНомерЗвонка))";
+                "callid NUMERIC(6), " +
+                "namelogfile VARCHAR, " +
+                "calldate timestamp NOT NULL, " +
+                "callyear NUMERIC(4), " +
+                "callmonth NUMERIC(2), " +
+                "callday NUMERIC(2), " +
+                "callhour NUMERIC(2), " +
+                "calltime VARCHAR(8), " +
+                "callduration NUMERIC(5), " +
+                "callednumber VARCHAR(16), " +
+                "destinationnumber VARCHAR(16), " +
+                "calldirection VARCHAR, " +
+                "calledname VARCHAR, " +
+                "destinationname VARCHAR, " +
+                "PRIMARY KEY (callid))";
 
         // выполнить SQL запрос
         ExecuteString(createTableSQL);
@@ -148,18 +150,20 @@ public class PostgresDB {
     // Запись звонка в базу данных
     public void writeCall(String nameTable, PhoneRing ring) {
         String insertTableSQL = "INSERT INTO " + nameTable + " (" +
-                "ПорядковыйНомерЗвонка, " +
-                "ИмяЛогФайла, " +
-                "ДатаВремяЗвонка, " +
-                "Год, " +
-                "Месяц, " +
-                "День, " +
-                "Час, " +
-                "ВремяЗвонка, " +
-                "ДлительностьЗвонка, " +
-                "ВызывающийНомер, " + // DN
-                "ВызываемыйНомер, " +
-                "НаправлениеЗвонка" +
+                "CallID, " +
+                "NameLogFile, " +
+                "CallDate, " +
+                "CallYear, " +
+                "CallMonth, " +
+                "CallDay, " +
+                "CallHour, " +
+                "CallTime, " +
+                "CallDuration, " +
+                "CalledNumber, " + // DN
+                "DestinationNumber, " +
+                "CallDirection, " +
+                "CalledName, " +
+                "DestinationName" +
                 ") VALUES (" +
                 String.valueOf(ring.getCallID()) + ", '" +
                 ring.getFileName() + "', " +
@@ -172,18 +176,20 @@ public class PostgresDB {
                 String.valueOf(ring.getDuration()) + ", " +
                 ring.getDefiantNumber() + ", " +
                 ring.getCalledNumber() + ", '" +
-                ring.getDirection() + "')";
+                ring.getDirection() + ", '" +
+                ring.getCalledName() + ", '" +
+                ring.getDestinationName() + "')";
 
         // выполнить SQL запрос
         ExecuteString(insertTableSQL);
     }
 
     // Создание таблицы абонентов
-    public void createTableAbonent() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS Subscribers (" +
-                "Номер VARCHAR(16), " + // DN
-                "Абонент VARCHAR, " +
-                "PRIMARY KEY (Номер))";
+    public void createTableAbonent(String nameTableSuscribers) throws SQLException {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS " + nameTableSuscribers + " (" +
+                "subscribernumber VARCHAR(16), " + // DN
+                "subscribername VARCHAR, " +
+                "PRIMARY KEY (subscribernumber))";
 
         // выполнить SQL запрос
         ExecuteString(createTableSQL);
@@ -192,8 +198,8 @@ public class PostgresDB {
     // Запись абонента
     public void writeAbonent(String NumberOfAbonent, String NameOfAbonent) {
         String insertTableSQL = "INSERT INTO Subscribers (" +
-                "Номер, " + // DN
-                "Абонент" +
+                "SubscriberNumber, " +
+                "SubscriberName" +
                 ") VALUES ('" +
                 NumberOfAbonent + "', '" +
                 NameOfAbonent + "')";
@@ -205,20 +211,20 @@ public class PostgresDB {
     // Чтение имени абонента
     public String getNameOfAbonent(String NumberOfAbonent) {
         // null если нет в базе данных
-        return ExecuteQuery("SELECT Абонент AS response FROM subscribers WHERE Номер = '" + NumberOfAbonent + "'");
+        return ExecuteQuery("SELECT SubscriberName AS response FROM subscribers WHERE Номер = '" + NumberOfAbonent + "'");
     }
 
-    public long getIDLastCall () {
-        String response = ExecuteQuery("SELECT MAX(ПорядковыйНомерЗвонка) AS response FROM calls");
+    public long getIDLastCall (String nameTable) {
+        String response = ExecuteQuery("SELECT MAX(CallID) AS response FROM " + nameTable);
         return Long.parseLong(response);
     }
 
-    public String getFileNameLast () {
-        return ExecuteQuery("SELECT MAX(ИмяЛогФайла) AS response FROM calls");
+    public String getFileNameLast (String nameTable) {
+        return ExecuteQuery("SELECT MAX(NameLogFile) AS response FROM " + nameTable);
     }
 
-    public boolean existEntry (String column, String value) {
-        String response = ExecuteQuery("SELECT EXISTS( SELECT " + column + " FROM calls WHERE " + column + " = '" + value + "') AS response");
+    public boolean existEntry (String column, String value, String nameTable) {
+        String response = ExecuteQuery("SELECT EXISTS( SELECT " + column + " FROM " + nameTable + " WHERE " + column + " = '" + value + "') AS response");
         return response.compareTo("t") == 0;
     }
 }
