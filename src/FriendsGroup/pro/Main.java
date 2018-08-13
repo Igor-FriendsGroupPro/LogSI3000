@@ -1,10 +1,6 @@
 package FriendsGroup.pro;
 
-/*
-Класс получает различные аргументы из командной строки
- */
-
-import java.io.*;
+import java.io.File;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Formatter;
@@ -12,31 +8,29 @@ import java.util.Formatter;
 public class Main {
 
     public static void main(String[] args) throws ParseException {
-        boolean showFiles = false; // Показывать файлы
-        String targetPath = ""; // Путь из аргумента
-        String targetFile = ""; // Файл для парсинга
-        String lastFile;        // Последний обработаный файл на момент запуска
-        Integer countFiles = 0; // Количество файлов
-        long allDuration = 0;
-        long allCountCall = 0;
-        int allDays = 0;
-        String nameTable = "calls";
-        String nameTableSubscribers = "subscribers";
+        String targetPath = "";                     // Путь из аргумента
+        String targetFile = "";                     // Файл для парсинга
+        String lastFile;                            // Последний обработаный файл на момент запуска
+        String tableCalls = "calls";                // Таблица звонков
+        String tableSubscribers = "subscribers";    // Таблица абонентов
+
+        // Инициализация лог файла
+        Log fileLog = new Log();
+        fileLog.setLogOptions("LogSI3000.log");
 
         // База данных
         PostgresDB database = new PostgresDB();
-        database.setParametrsDatabase("postgres", "postgres");
+        database.setDatabaseOptions("postgres", "postgres");
+
         // Создание таблицы
         try {
-            database.createTableCalls(nameTable);
-            database.createTableAbonent(nameTableSubscribers);
+            database.createTableCalls(tableCalls);
+            database.createTableAbonent(tableSubscribers);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        lastFile = database.getFileNameLast(nameTable);
+        lastFile = database.getFileNameLast(tableCalls);
         //long lastIDCall = database.getIDLastCall();
-
-        Day tempDay = new Day(); // Создали первый день
 
 
         // Перебор всех аргументов и определение задачи
@@ -51,22 +45,20 @@ public class Main {
             case 1:
                 targetPath = args[0]; // Получили путь
                 System.out.println("Директория: " + targetPath);
-                showFiles = true;
 
                 File fileList[] = new File(targetPath).listFiles(); // Список объектов (файлов и директорий)
 
                 // Перебор всех объектов
                 for (File object : fileList) {
 
-                    countFiles = 0;
                     if (object.isFile()) {
                         targetFile = object.getName();
                         ParsingLogFile tempParsingLogFile = new ParsingLogFile();
                         tempParsingLogFile.ParsingNameLogFile(targetFile);
 
                         // Обработка отсутствующего файла
-                        if (!database.existEntry("NameLogFile", tempParsingLogFile.shortLogFileName, nameTable)
-                                || lastFile.compareTo(tempParsingLogFile.shortLogFileName) == 0) {
+                        if (!database.existEntry("NameLogFile", tempParsingLogFile.shortLogFileName, tableCalls)
+                                || lastFile.equals(tempParsingLogFile.shortLogFileName)) {
 
                             if (tempParsingLogFile.parsigFile(targetPath, targetFile)) {
                                 System.out.println("Обработан файл  " + tempParsingLogFile.shortLogFileName + " дата "
@@ -75,7 +67,7 @@ public class Main {
                                 // Преребор блоков
                                 for (int i = 0; i <= tempParsingLogFile.countBloks; i++) {
 //                                    System.out.println("ПорядковыйНомерЗвонка " + String.valueOf(tempParsingLogFile.SI[i]));
-                                    if (!database.existEntry("CallID", String.valueOf(tempParsingLogFile.SI[i]), nameTable)) {
+                                    if (!database.existEntry("CallID", String.valueOf(tempParsingLogFile.SI[i]), tableCalls)) {
 
                                         // Создание отдельного звонка
                                         PhoneRing tempPhoneRing = new PhoneRing();
@@ -89,7 +81,7 @@ public class Main {
                                         //System.out.println("ID звонка  " + tempPhoneRing.getCallID());
 
                                         // База данных таблица звонков
-                                        database.writeCall(nameTable, tempPhoneRing);
+                                        database.writeCall(tableCalls, tempPhoneRing);
 
                                     }
                                 }
@@ -114,6 +106,7 @@ public class Main {
                 }
                 break;
         }
+
     }
 
 }

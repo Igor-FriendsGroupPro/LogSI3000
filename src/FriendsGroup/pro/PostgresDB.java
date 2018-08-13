@@ -10,7 +10,7 @@ public class PostgresDB {
     private String urlDatabase;
 
     // Сеттеры
-    public void setParametrsDatabase(String loginDatabase, String passwordDatabase) {
+    public void setDatabaseOptions(String loginDatabase, String passwordDatabase) {
         nameDatabase = "LogSI3000";
 //        this.nameDatabase = nameDatabase;
         urlDatabase = "jdbc:postgresql://localhost:5432/";

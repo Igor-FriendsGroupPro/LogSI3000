@@ -1,7 +1,5 @@
 package FriendsGroup.pro;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Formatter;
 
 public class Day {
@@ -35,7 +33,7 @@ public class Day {
     public void print(String nameFile) {
         Formatter line = new Formatter();
         if (day != 0) {
-            IOReport reportFile = new IOReport();
+            Log reportFile = new Log();
             System.out.println();
 
             line.format("Дата: " + getDDMMYYYY());
