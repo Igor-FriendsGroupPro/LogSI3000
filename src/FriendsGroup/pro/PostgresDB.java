@@ -4,30 +4,36 @@ import java.sql.*;
 
 public class PostgresDB {
 
+    /** Параметры доступа к базе данных */
     private String nameDatabase;
     private String loginDatabase;
     private String passwordDatabase;
     private String urlDatabase;
 
-    // Сеттеры
+    /** Установка параметров базы данных
+     * @param loginDatabase Логин для доступа к БД
+     * @param passwordDatabase Пароль для доступа к БД
+     * */
     public void setDatabaseOptions(String loginDatabase, String passwordDatabase) {
+        // Имя БД
         nameDatabase = "LogSI3000";
-//        this.nameDatabase = nameDatabase;
+        // Адрес БД
         urlDatabase = "jdbc:postgresql://localhost:5432/";
-//        this.urlDatabase = urlDatabase;
 
         this.loginDatabase = loginDatabase;
         this.passwordDatabase = passwordDatabase;
     }
 
-    // Геттеры
+    /** Геттеры параметров БД */
     public String getNameDatabase() {return nameDatabase;}
     public String getLoginDatabase() {return loginDatabase;}
     public String getPasswordDatabase() {return passwordDatabase;}
     public String getUrlDatabase() {return urlDatabase;}
 
-    // Соединение с базой данных
-    private Connection getDBConnection() {
+    /** Соединение с базой данных
+     * @return Возвращает соединение с БД
+     * */
+    private Connection getDBConnectionPostgres() {
         Connection dbConnection = null;
         try {
             Class.forName("org.postgresql.Driver");
@@ -53,7 +59,7 @@ public class PostgresDB {
 //        System.out.println(exStringSQL);
 
         try {
-            dbConnection = getDBConnection();
+            dbConnection = getDBConnectionPostgres();
             statement = dbConnection.createStatement();
 
             // выполнить SQL строку
@@ -80,7 +86,7 @@ public class PostgresDB {
 
         try {
             // Соединение с базой данных
-            dbConnection = getDBConnection();
+            dbConnection = getDBConnectionPostgres();
             statement = dbConnection.createStatement();
 
             // выполнить SQL запрос
@@ -89,6 +95,8 @@ public class PostgresDB {
                 response = resultString.getString("response");
             }
 
+            //resultString.first();
+            //response = resultString.getString("response");
             dbConnection.close();
             return response;
 
@@ -99,7 +107,33 @@ public class PostgresDB {
 
     }
 
-    // Создание таблицы звонков
+/*    // Выполнение запроса SQL запроса с получением результата
+    public ResultSet ExecuteQueryFull(String exStringSQL) {
+        Connection dbConnection;
+        Statement statement;
+        String response = null;
+
+        try {
+            // Соединение с базой данных
+            dbConnection = getDBConnectionPostgres();
+            statement = dbConnection.createStatement();
+
+            // выполнить SQL запрос
+            ResultSet resultSet = statement.executeQuery(exStringSQL);
+
+            dbConnection.close();
+            return resultString;
+
+        } catch (SQLException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+        return null;
+
+    }
+*/
+    /** Создание таблицы звонков
+     * @param nameTable Имя таблицы
+     * */
     public void createTableCalls(String nameTable) throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS " + nameTable + " (" +
                 "callid NUMERIC(6), " +
@@ -113,9 +147,6 @@ public class PostgresDB {
                 "callduration NUMERIC(5), " +
                 "callednumber VARCHAR(16), " +
                 "destinationnumber VARCHAR(16), " +
-                "calldirection VARCHAR, " +
-                "calledname VARCHAR, " +
-                "destinationname VARCHAR, " +
                 "PRIMARY KEY (callid))";
 
         // выполнить SQL запрос
@@ -141,12 +172,43 @@ public class PostgresDB {
         }
     }
 
-    // Очистка таблицы
+    /** Очистка таблицы
+     * @param nameTable Имя таблицы
+     * */
     public void clearTable(String nameTable){
         // выполнить SQL запрос
         ExecuteString("DELETE FROM " + nameTable);
     }
 
+    // Запись ЧНН
+/*    public void writeHourOfMaximumLoad(String dateHML)
+      String insertTableSQL = "(" +
+SELECT COUNT(*) AS amountcalls, SUM(CallDuration) AS amountduration, hml, hmldate
+FROM (
+
+ SELECT MAKE_DATE(EXTRACT(YEAR FROM CallDate)::integer, EXTRACT(MONTH FROM CallDate)::integer, EXTRACT(DAY FROM CallDate)::integer) AS HMLdate,
+	EXTRACT(HOUR FROM CallDate) AS HML, CallDuration,
+    CASE WHEN (CN.SubscriberName IS NULL) AND (DN.SubscriberName IS NOT NULL) THEN 'Входящий'
+    WHEN (CN.SubscriberName IS NOT NULL) AND (DN.SubscriberName IS NULL) THEN 'Исходящий'
+    WHEN (CN.SubscriberName IS NOT NULL) AND (DN.SubscriberName IS NOT NULL) THEN 'Внутренний'
+       ELSE 'Неизвестный' END AS calldirection
+ FROM calls LEFT JOIN subscribers AS CN ON calls.CalledNumber = CN.SubscriberNumber
+           LEFT JOIN subscribers AS DN ON calls.DestinationNumber = DN.SubscriberNumber
+ WHERE CallDate BETWEEN '2018-07-01' AND '2018-07-02'
+ ) AS TempTable
+
+WHERE CallDirection = 'Входящий'
+GROUP BY HMLDate, HML
+ORDER BY amountcalls DESC
+LIMIT 1
+            "')";
+
+    // выполнить SQL запрос
+    //System.out.println(insertTableSQL);
+    ExecuteString(insertTableSQL);
+
+    )
+**/
     // Запись звонка в базу данных
     public void writeCall(String nameTable, PhoneRing ring) {
         String insertTableSQL = "INSERT INTO " + nameTable + " (" +
@@ -160,10 +222,10 @@ public class PostgresDB {
                 "CallTime, " +
                 "CallDuration, " +
                 "CalledNumber, " + // DN
-                "DestinationNumber, " +
-                "CallDirection, " +
-                "CalledName, " +
-                "DestinationName" +
+                "DestinationNumber" +
+//                "CallDirection, " +
+//                "CalledName, " +
+//                "DestinationName" +
                 ") VALUES (" +
                 String.valueOf(ring.getCallID()) + ", '" +
                 ring.getFileName() + "', " +
@@ -175,10 +237,11 @@ public class PostgresDB {
                 String.valueOf(ring.getTime()) + "', " +
                 String.valueOf(ring.getDuration()) + ", '" +
                 ring.getDefiantNumber() + "', '" +
-                ring.getCalledNumber() + "', '" +
-                ring.getDirection() + "', '" +
-                ring.getCalledName() + "', '" +
-                ring.getDestinationName() + "')";
+                ring.getCalledNumber() + //"', '" +
+//                ring.getDirection() + "', '" +
+//                ring.getCalledName() + "', '" +
+//                ring.getDestinationName() +
+                "')";
 
         // выполнить SQL запрос
         //System.out.println(insertTableSQL);

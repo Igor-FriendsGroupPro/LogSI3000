@@ -39,7 +39,7 @@ public class PhoneRing {
 
     // Сеттеры
     // Внутренний идентификатор звонка в SI3000
-    public void setCallID(int callID) {
+    void setCallID(int callID) {
         this.callID = callID;
     }
 

@@ -1,6 +1,7 @@
 package FriendsGroup.pro;
 
 import java.io.File;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Formatter;
@@ -30,8 +31,8 @@ public class Main {
             e.printStackTrace();
         }
         lastFile = database.getFileNameLast(tableCalls);
-        //long lastIDCall = database.getIDLastCall();
 
+        //ResultSet temp = new ResultSet()
 
         // Перебор всех аргументов и определение задачи
         System.out.println("Передано аргументов: " + args.length);
@@ -106,7 +107,7 @@ public class Main {
                 }
                 break;
         }
-
+/**/
     }
 
 }
